@@ -1,3 +1,12 @@
+### python related .gitignore ###
+
+
+
+## .code-workspace file
+*.code-workspace
+
+### LaTeX related .gitignore ###
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -19,7 +28,12 @@
 # these rules might exclude image files for figures etc.
 # *.ps
 # *.eps
-# *.pdf
+
+# ----------------------------------------------------------------------
+# ----------------------------> ATTENTION! <----------------------------
+# For now, I ignore the pdf, in order to reduce conflicts when branching 
+*.pdf
+# ----------------------------------------------------------------------
 
 ## Generated if empty string is given at "Please type another file name for output:"
 .pdf
