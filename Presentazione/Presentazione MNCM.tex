@@ -1,4 +1,6 @@
 \documentclass[10pt,xcolor={table,dvipsnames}]{beamer} 		% carica automaticamente amsthm, amssymb, amsmath, graphicx
+\setbeamertemplate{theorems}[numbered]%[ams style] 
+
 
 \usepackage[T1]{fontenc}				% codifica dei font
 \usepackage[utf8]{inputenc}				% lettere accentate da tastiera
@@ -31,10 +33,10 @@
 
 	% TEOREMI CUSTOM:
 \theoremstyle{plain}					% Definisce ambienti per Teoremi, esercizi, corollari... Con lo stile adeguato
-	\newtheorem{proposizione}{Proposizione}[section]
+	\newtheorem{proposizione}{Proposizione}%[section]
 	\newtheorem*{proposizione*}{Proposizione}
 	
-	\newtheorem{teorema}{Teorema}[section]
+	\newtheorem{teorema}{Teorema}%[section]
 	\newtheorem*{teorema*}{Teorema}
 		
 	%\newtheorem{lemma_es}{Lemma}[esercizio]
@@ -44,22 +46,37 @@
 
 
 \theoremstyle{definition}				
-	\newtheorem{definizione}{Definizione}[section]%[chapter]
+	\newtheorem{definizione}{Definizione}%[section]%[chapter]
 	\newtheorem*{definizione*}{Definizione}	%definizione non numerata
 	\newtheorem*{notazione}{Notazione}
 
 \theoremstyle{remark}
-	\newtheorem{oss}{Osservazione}[section]
+	\newtheorem{oss}{Osservazione}%[section]
 	\newtheorem*{oss*}{Osservazione}
 
 
 	% COMANDI CUSTOM
 % Define the \indicator command
 \NewDocumentCommand{\indicator}{O{t} O{m} O{i}}{%
-  \mathlarger{\mathbbm{1}}\qty{\scriptstyle {x}_{#1}^{(#2)}=#3}%
+  \mathlarger{\mathbbm{1}}\qty{\scriptstyle {x}_{#1}^{#2}=#3}%
 }
 % Define the \transpose command
 \newcommand{\transpose}[1]{\prescript{t}{}{#1}}
+% Define the \Var command, for the variance
+\newcommand{\Var}[1]{\operatorname{Var}\qty(#1)}
+% Define the \Cov command, for the covariance
+\newcommand{\Cov}[1]{\operatorname{Cov}\qty(#1)}
+
+% Define a command to create unnumbered footnotes
+\let\svthefootnote\thefootnote
+\textheight 1in
+\newcommand\blankfootnote[1]{%
+  \let\thefootnote\relax\footnotetext{#1}%
+  \let\thefootnote\svthefootnote%
+}
+% Define the \independent symbol, for independence
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+    \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
 	%COLORI
 \definecolor{madridlightblue}{RGB}{233, 233, 243}
@@ -77,13 +94,35 @@
 %\titlegraphic{\includegraphics[width=2cm]{Immagini/cherubino_black.eps}}
 \date[\today]{Metodi Numerici per le Catene di Markov\newline Seminario di fine corso}
 
-\AtBeginSection[] 						
+\AtBeginSubsection[] 						
 {
 	\begin{frame}
 		\frametitle{Sommario}
-		\tableofcontents[currentsection,subsectionstyle=show/show/hide] 
+		\tableofcontents[currentsection,subsectionstyle=show/shaded/hide] 
 	\end{frame}
 }
+
+%%% ----------- ALTERNATIVA -----------
+%% Custom command to insert the summary frame
+%\newcommand{\insertSummaryFrame}{
+%    \begin{frame}
+%        \frametitle{Sommario}
+%        \tableofcontents[currentsection, subsectionstyle=show/shaded/hide]
+%    \end{frame}
+%}
+%
+%% Show summary at the beginning of each section
+%\AtBeginSection[]
+%{
+%    \insertSummaryFrame
+%}
+%
+%% Show summary at the beginning of each subsection
+%\AtBeginSubsection[]
+%{
+%    \insertSummaryFrame
+%}
+
 
 \begin{document}
 	\begin{frame}[plain]
@@ -99,9 +138,12 @@
 	
 	\setcounter{tocdepth}{2}
 
-\section{Introduzione, notazione e prime definizioni}
 
-	\begin{frame}{Introduzione al problema, notazione}%{Descrizione del contesto}
+
+\section{Introduzione, notazione e prime definizioni}
+	\subsection*{prova}
+
+	\begin{frame}{Introduzione al problema, notazione, modello 1/2}%{Descrizione del contesto}
 		Supponiamo di avere una popolazione di $N\in\mathbb{N}_{>0}$ individui che evolvono da 
 		uno stato all'altro {\smaller ($S\in\mathbb{N}_{>0}$: numero di possibili stati)}, 
 		\emph{indipendentemente}, per $T\in\mathbb{N}_{>0}$ istanti temporali 
@@ -143,7 +185,7 @@
 		\end{itemize}
 	\end{frame}
 
-	\begin{frame}{Modello}
+	\begin{frame}{Introduzione al problema, notazione, modello 2/2}
 		\begin{figure}[ht]
 			\centering
 			\includegraphics[width=0.45\textwidth]{Immagini/plate_model.png}
@@ -170,39 +212,180 @@
 	\end{frame}
 
 	\begin{frame}
-		{\hypertarget{frame:dettagli_nt}{Notazione, definizioni preliminari 3/3}}
-		% Cura sottotitolo!
-		%{Dettagli su $\vb*{n}_t$}
-		\begin{definizione}
+		{\hypertarget{frame:dettagli_nt}{Osservazioni su $\vb*{n}_t$ e su $P$}}
+		\begin{definizione*}
 			Siano $\vb*{\mu}_t\in\R{S}$ e $\vb*{\mu}_{t,t+1}\in\R{S}{S}$ il vettore e la matrice
 			delle leggi marginali:
 			\vspace*{-0.5\baselineskip}
 			\[\begin{aligned}
 				\vb*{\mu}_t(i)=\P{x_t=i}=\qty(\transpose{\pi_0}P^t)_i & \qquad & \vb*{\mu}_{t,t+1}(i,j)=\P{x_t=i,x_{t+1}=j}\\
 			\end{aligned}\]
-		\end{definizione}
+		\end{definizione*}
 
-		\begin{oss}
+		\begin{oss*}<2->
 			\begin{itemize}
-				\item $\vb*{n}_t(i)=\sum_{m=1}^N\indicator$: numero di individui nello stato $i\in S$,
+				\item<2-> $\vb*{n}_t(i)=\sum_{m=1}^N\indicator$: numero di individui nello stato $i\in S$,
 				al tempo $t\in T$.
-				\item $\P{\indicator =1}=\P{x_t^{(m)}=i}=\vb*{\mu}_t(i)$
-				\item $\vb*{n}_t$ è multinomiale di parametri $N,\vb*{\mu}_t$
+				\item<3-> $\P{\indicator =1}=\P{x_t^{(m)}=i}=\vb*{\mu}_t(i)$
+				\item<4-> $\vb*{n}_t$ è multinomiale di parametri $N,\vb*{\mu}_t$
 				(cfr. Appendice~\hyperlink{frame:dettagli_nt:appendice}{\faHandPointRight})
 			\end{itemize}
-		\end{oss}
+		\end{oss*}
 
-		\begin{oss}
+		\begin{oss*}<5->
 			Si ha $P=\operatorname{Diag}\qty(\vb*{\mu}_t)^{-1}\cdot\vb*{\mu}_{t,t+1}$.
 
-			Se $\pi_0=\pi$, $\vb*{\mu}_t=\pi\quad\forall\,t\in[T]$ e dunque 
-			$\operatorname{Diag}\qty(\vb*{\mu}_t)$ è invertibile. 
-			Altrimenti, $\vb*{\mu}_t>0$ per $t$ grande abbastanza. 
+			\onslide<6->{Se $\pi_0=\pi$, $\vb*{\mu}_t=\pi\quad\forall\,t\in[T]$ e dunque 
+			$\operatorname{Diag}\qty(\vb*{\mu}_t)$ è invertibile.} 
+			\onslide<7->{Altrimenti, $\vb*{\mu}_t>0$ per $t$ grande abbastanza. }
 			%infatti 
 			%$P_{i,j}=\P{x_{t+1}=j}{x_t=i}=\P{x_t=i,x_{t+1}=j}/\,\P{x_t=i}=\vb*{\mu}_{t,t+1}(i,j)/\,\vb*{\mu}_t(i)$
-		\end{oss}
+		\end{oss*}
+
+	\end{frame}
 
 
+
+\section{Stimatori per \texorpdfstring{$P$}{P}}
+	\subsection{Minimi quadrati condizionati}
+
+	\begin{frame}
+		{\hypertarget{frame:CLS}{Minimi quadrati condizionati}}
+		Lo stimatore dei minimi quadrati condizionati (CLS) si basa sull'idea che
+		$\vb*{n}_{t}\approx\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]$.
+		\onslide<2->{Si dimostra (cfr. Appendice~\hyperlink{frame:dettagli_val_atteso_condiz_nt:appendice}{\faHandPointRight})
+		che $\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
+		\smallskip
+
+		\onslide<3->{Siano 
+		\vspace*{-0.5\baselineskip}
+		\begin{align*}		
+			\R{(T-1)}{S}\ni X &\coloneqq
+			\left(\begin{array}{c|c|c|c}
+				%\hline
+				\vb*{n}_1 & \vb*{n}_2 & \dots & \vb*{n}_{T-1} \\
+				%\hline
+			\end{array}\right)\\
+			\R{(T-1)}{S}\ni Y &\coloneqq
+			\left(\begin{array}{c|c|c|c}
+				%\hline
+				\vb*{n}_2 & \vb*{n}_3 & \dots & \vb*{n}_{T} \\
+				%\hline
+			\end{array}\right)
+		\end{align*}}
+
+		\onslide<4->{L'insieme di relazioni $\vb*{n}_t\approx\transpose{\vb*{n}_{t-1}}P\quad\forall\,t\in\qty{2,\dots,T}$
+		definisce un problema ai minimi quadrati $\norm{XP-Y}_{F}^2$, di cui 
+		lo stimatore CLS è la soluzione:
+		\[
+			\hat{P}_{\textup{CLS}}\coloneqq\argmin_P\norm{XP-Y}_{F}^2=\qty(\transpose{X}X)^{-1}\transpose{X}Y
+		\]}
+
+		% C'è la questione dell'invertibilità di $\transpose{X}X$, e se 
+		% $\hat{P}_{\textup{CLS}}$ è normalizzata
+
+	\end{frame}
+
+
+	\subsection{Metodo dei momenti}
+
+	\begin{frame}
+		{\hypertarget{frame:prop_1}{Momenti primi e secondi}}
+		
+		\setbeamercovered{transparent}
+		\begin{notazione}
+			Denotiamo \onslide<1,4->{il momento primo}\onslide<4->{,} 
+			\onslide<2,3->{i momenti secondi }\onslide<2,4->{centrali}
+			\onslide<4->{e }\onslide<3->{non centrali} con:
+			\vspace{-0.5\baselineskip}
+			\begin{align*}
+				\onslide<1,4->{\R{S}\ni\,&\vb*{m}_t\coloneqq\mathbb{E}\qty[\vb*{n}_t]} & & \\
+				\onslide<2,4->{\R{S}{S}\ni\,&\Sigma_t\coloneqq\Var{\vb*{n}_t}} & \onslide<3->{\R{S}{S}\ni\,&\Lambda_t\coloneqq\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]}\\
+				\onslide<2,4->{\R{S}{S}\ni\,&\Sigma_{t,t+1}\coloneqq\Cov{\vb*{n}_t,\vb*{n}_{t+1}}} & \onslide<3->{\R{S}{S}\ni\,&\Lambda_{t,t+1}\coloneqq\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]}
+			\end{align*}
+		\end{notazione}
+		\setbeamercovered{invisible}
+
+		\begin{proposizione}<5->\label{prop:formule_momenti}
+			\vspace{-0.25\baselineskip}
+			Per ogni $t\in[T]$, si ha:
+			\vspace{-0.25\baselineskip}
+			\begin{columns}
+				\begin{column}{0.45\textwidth}
+					\begin{enumerate}
+						\item $\vb*{m}_t=N\vb*{\mu}_t$
+						\item $\Sigma_t=N\cdot\qty(\operatorname{Diag}(\vb*{\mu}_t)-\vb*{\mu}_t\transpose{\vb*{\mu}_t})$	
+						\item $\Sigma_{t,t+1}=N\cdot\qty(\vb*{\mu}_{t,t+1}-\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
+					\end{enumerate}
+				\end{column}
+				\begin{column}{0.55\textwidth}
+					\begin{enumerate}
+						\setcounter{enumi}{3}
+						\item $\Lambda_t=N\cdot\qty(\operatorname{Diag}(\vb*{\mu}_t)+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})$
+						\item $\Lambda_{t,t+1}=N\cdot\qty(\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
+					\end{enumerate}
+				\end{column}				
+			\end{columns}
+		\end{proposizione}
+		\begin{proof}<6->
+			Cfr. Appendice~\hyperlink{frame:dim_prop_1:appendice}{\faHandPointRight}
+		\end{proof}
+	\end{frame}
+
+	\begin{frame}
+		{\hypertarget{frame:CLS_as_moment}{Lo stimatore CLS come stimatore dei momenti 1/2}}
+		{Ricavare $\hat{P}_{\textup{CLS}}$ con il metodo dei momenti}
+
+		Si dimostra (Cfr. Appendice~\hyperlink{frame:dim_prop_2:appendice}{\faHandPointRight})
+		che $P=\Lambda_t^{-1}\Lambda_{t,t+1}$. \onslide<2->{Inoltre, posto
+		\begin{align*}
+			\hat{\Lambda}_t&\coloneqq\frac{1}{T-1}\transpose{X}X=\frac{1}{T-1}\sum_{t=1}^{T-1}\vb*{n}_t\transpose{\vb*{n}_t}\qquad\text{e}\\
+			\hat{\Lambda}_{t,t+1}&\coloneqq\frac{1}{T-1}\transpose{X}Y=\frac{1}{T-1}\sum_{t=1}^{T-1}\vb*{n}_t\transpose{\vb*{n}_{t+1}},
+		\end{align*}
+		si ha $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t\hat{\Lambda}_{t,t+1}$.}
+		\smallskip
+
+		\onslide<3->{$\hat{\Lambda}_t$ e $\hat{\Lambda}_{t,t+1}$ si possono interpretare come 
+		"stime empiriche" di 
+		$\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]=\Lambda_t$ e 
+		$\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]=\Lambda_{t,t+1}$ rispettivamente.}
+		\smallskip
+
+		\onslide<4->{Dunque $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t\hat{\Lambda}_{t,t+1}$ 
+		ha un'interpretazione come stimatore ottenuto con il \emph{metodo dei momenti}.} 
+
+	\end{frame}
+
+	\begin{frame}
+		{Lo stimatore CLS come stimatore dei momenti 2/2}
+		{$\hat{P}_{\textup{CLS}}$ non è consistente}
+
+		%Supponiamo $\vb*{y}_t=\vb*{n}_t+\epsilon_t\quad\forall\,t\in[T]$, con 
+		%$\epsilon_t\independent\epsilon_{t'}$, $\mathbb{E}\qty[\epsilon_t]=0$,
+		%$\Var{\epsilon_t}=<\infty\quad\forall\,t\ne t'$. 
+
+		Supponiamo $\vb*{y}_t=\vb*{n}_t+\epsilon_t$, con 
+		$\mathbb{E}\qty[\epsilon_t]=0$, $\Var{\epsilon_t}=<\infty\quad\forall\,t\in[T]$,
+		e $\epsilon_t\independent\epsilon_{t'}\quad\forall\,t\ne t'$.
+		
+		Si ha $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_t}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]+\Var{\epsilon_t}$,
+		e $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_{t+1}}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]$.
+		\smallskip
+
+		Dunque con osservazioni rumorose
+		\[
+			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+V)^{-1}\Lambda_{t,t+1}\xcancel{\overset{T\to\infty}{\longrightarrow}P}
+		\]
+		ossia $\hat{P}_{\textup{CLS}}$ non è consistente con osservazioni rumorose.
+
+		Il prossimo stimatore sarà consistente anche con osservazioni rumorose.
+	\end{frame}
+
+	\begin{frame}
+		{Lo stimatore dei momenti}
+		Ricordiamo che $P=\operatorname{Diag}\qty(\vb*{\mu}_t)^{-1}\cdot\vb*{\mu}_{t,t+1}$.
+		Lo stimatore dei momenti si ottiene sostituendo a $\vb*{\mu}_t,\vb*{\mu}_{t,t+1}$
+		le loro stime empiriche: 
 	\end{frame}
 
 
@@ -234,6 +417,8 @@
 		\end{thebibliography}
 	\end{frame}
 
+
+
 \section*{Appendice}
 	\begin{frame}
 		\begin{center}
@@ -243,10 +428,10 @@
 
 	\begin{frame}
 		{\hypertarget{frame:catena_ergodica:appendice}{Catene di Markov ergodiche}}
-		\begin{definizione}
+		\begin{definizione*}
 			Ricordiamo che una catena di Markov è detta \alert{ergodica} se è
 			irriducibile, positiva ricorrente e aperiodica.
-		\end{definizione}
+		\end{definizione*}
 		\onslide<2->{Una catena ergodica {\smaller (in quanto irriducibile e positiva 
 		ricorrente)} ha una distribuzione invariante $\pi$. Inoltre:}
 		\begin{itemize}
@@ -256,17 +441,16 @@
 			$T_i\coloneqq\inf_{n\ge 1}\qty{X_n=i}$ {\smaller (istante di primo passaggio)},
 			e in particolare $\pi_i>0$			
 		\end{itemize}
-		\begin{oss}<4->
+		\begin{oss*}<4->
 			Per una catena finita e irriducibile {\smaller (dunque positiva ricorrente)},
 			le due condizioni precedenti si possono ricavare dal teorema di Perron-Frobenius.
-		\end{oss}
+		\end{oss*}
 
 		\onslide<5->{Il \emph{teorema di convergenza all'equilibrio} dice che per una 
 		catena ergodica vale $\lim_{n\to\infty}\P{x_n=i}=\pi_i$. 
 		In particolare $P_{i,j}\overset{n}{\longrightarrow}\pi_j\quad\forall\,i,j\in[S]$.}
-		\vfill
 
-		(Indietro:~\hyperlink{frame:intro}{\faHandPointLeft})
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:intro}{\faHandPointLeft}}
 	\end{frame}
 
 	\begin{frame}
@@ -292,11 +476,195 @@
 		\bigskip 
 
 		\textcolor{red}{Disegno}
-		\vfill
 		
-		(Indietro:~\hyperlink{frame:dettagli_nt}{\faHandPointLeft})
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:dettagli_nt}{\faHandPointLeft}}
 	\end{frame}
 
+	\begin{frame}
+		{\hypertarget{frame:dettagli_val_atteso_condiz_nt:appendice}{Calcolo di $\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]$}}
+
+		Sia $T_{i,j}^{(t-1)}$ la v.a. che conta il numero di individui che, all'istante $t-1\in[T]$,
+		si spostano dallo stato $i\in[S]$ a $j\in[S]$. Allora $\vb*{n}_t(j)=\sum_{i=1}^S T_{i,j}^{(t-1)}$.
+		\smallskip
+
+		\onslide<2->{Conoscendo $\vb*{n}_{t-1}(i)$, $T_{i,j}^{(t-1)}$ è 
+		binomiale di parametri $\vb*{n}_{t-1}(i)$ e $P_{i,j}$:
+		%$\P{T_{i,j}^{(t-1)}}{\vb*{n}_{t-1}}=\mathcal{B}\qty(\vb*{n}_t(i),(P_{i,j},1-P_{i,j});2)$
+		\[
+			\P{T_{i,j}^{(t-1)}=\alpha}{\vb*{n}_{t-1}}=\smqty(\vb*{n}_{t-1}(i)\\ \alpha)\cdot P_{i,j}^{\alpha}\cdot(1-P_{i,j})^{1-\alpha}
+		\]}
+		%\vspace*{-0.5\baselineskip}
+
+		\onslide<3->{Ne segue che 
+		\vspace*{-0.5\baselineskip}
+		\begin{align*}
+			\mathbb{E}\qty[\vb*{n}_t(j)\mid\vb*{n}_{t-1}]&=\sum_{i=1}^S \mathbb{E}\qty[T_{i,j}^{(t-1)}\mid\vb*{n}_{t-1}]=\sum_{i=1}^{S}\mathbb{E}\qty[T_{i,j}^{(t-1)}\mid\vb*{n}_{t-1}(i)]\\
+			&=\sum_{i=1}^{S}\vb*{n}_{t-1}(i)P_{i,j}=\qty(\transpose{\vb*{n}_{t-1}}P)_j
+		\end{align*}
+		Ovvero $\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
+
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
+	\end{frame}
+
+	\begin{frame}
+		{\hypertarget{frame:dim_prop_1:appendice}{Dimostrazione della Proposizione~\ref{prop:formule_momenti}$\qquad$ 1/4}}
+		\begin{block}{Dimostrazione.}
+			$\vb*{n}_t$ è multinomiale di parametri $N$ e $\vb*{\mu}_t$, 
+			$\vb*{n}_t=\sum_{m=1}^{N}V_t^{(m)}$, con $V_t^{(m)}$ categorica di parametro $\vb*{\mu}_t$,
+			e $V_t^{(m)}\independent V_t^{(m')}\quad\forall m\ne m'$. Ometteremo l'apice quando sarà irrilevante.
+			\begin{enumerate}
+				\item\label{proof:prop_1:point_1} $\mathbb{E}\qty[\vb*{n}_t]=N\vb*{\mu}_t$ è un risultato noto sulle v.a. multinomiali. 
+				Segue dal fatto che $\vb*{n}_t(i)$ è binomiale di parametri $N$ e $\vb*{\mu}_t(i)$. 
+				\smallskip
+
+				Comunque,
+				$\mathbb{E}\qty[\vb*{n}_t]=\sum_{m=1}^{N}\mathbb{E}\qty[V_t^{(m)}]=N\,\mathbb{E}\qty[V_t]$, e si ha
+				\vspace{-0.5\baselineskip}
+				\begin{align*}
+					\R{S}\ni\mathbb{E}\qty[V_t]&=\sum_{i=1}^{S}e_i\cdot\P{V_t=e_i}=\sum_{i=1}^{S}e_i\cdot\P{V_t(i)=1}\\
+					& = \sum_{i=1}^{S}e_i\cdot\P{\indicator[t][{}][i]=1}=\sum_{i=1}^{S}e_i\cdot\vb*{\mu}_t(i)=\vb*{\mu}_t
+				\end{align*}
+				da cui segue che $\vb*{m}_t=\mathbb{E}\qty[\vb*{n}_t]=N\,\vb*{\mu}_t$.				
+			\end{enumerate}
+		\end{block}
+	
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_1}{\faHandPointLeft}}
+	\end{frame}
+
+	\begin{frame}
+		{Dimostrazione della Proposizione~\ref{prop:formule_momenti}$\qquad$ 2/4}
+		
+		\begin{block}{}
+			\begin{enumerate}
+				\setcounter{enumi}{1}
+				\item Per indipendenza e per il punto~\eqref{proof:prop_1:point_1} si ha
+				\vspace{-0.5\baselineskip}
+				\begin{align*}
+					\Sigma_t&=\Var{\vb*{n}_t}=\sum_{m=1}^{N}\Var{V_t^{(m)}}=N\cdot\Var{V_t}\\
+					&=N\cdot(\mathbb{E}\qty[V_t\transpose{V_t}]-\mathbb{E}\qty[V_t]\cdot\mathbb{E}\qty[\transpose{V_t}])=N\cdot(\mathbb{E}\qty[V_t\transpose{V_t}]-\vb*{\mu}_t\transpose{\vb*{\mu}_t})
+				\end{align*}
+				Ora, $\R{S}{S}\ni\mathbb{E}\qty[V_t\transpose{V_t}]$ è t.c.
+				\vspace{-0.5\baselineskip}
+				\begin{align*}
+					\mathbb{E}\qty[V_t\transpose{V_t}]_{i,j}&=\mathbb{E}\qty[V_t(i)\cdot V_t(j)]=\smashoperator[rl]{\sum_{\alpha,\beta=0}^{1}}\alpha\beta\cdot\P{V_t(i)=\alpha,V_t(j)=\beta}\\
+					& = \P{V_t(i)=1,V_t(j)=1}=
+					\begin{dcases*}
+						0 & se $i\ne j$\\
+						\vb*{\mu}_t(i) & se $i=j$
+					\end{dcases*}
+				%\intertext{$V_t\in\qty{e_1,\dots,e_S}$, quindi non può
+				%assumere valore 1 su due componenti diverse. Ne segue che}
+				%	&  \P{V_t(i)=1,V_t(j)=1}=
+				%	\begin{dcases*}
+				%		0 & se $i\ne j$\\
+				%		\vb*{\mu}_t(i) & se $i=j$
+				%	\end{dcases*}\\
+				\end{align*}
+				Infatti $V_t\in\qty{e_1,\dots,e_S}$, quindi non può
+				assumere valore 1 su due componenti diverse.
+
+				Dunque $\mathbb{E}\qty[V_t\transpose{V_t}]=\operatorname{Diag}\qty(\vb*{\mu}_t)$ 
+				e si ha $\Sigma_t=N\cdot(\operatorname{Diag}\qty(\vb*{\mu}_t)-\vb*{\mu}_t\transpose{\vb*{\mu}_t})$
+			\end{enumerate}
+		\end{block}
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_1}{\faHandPointLeft}}
+	\end{frame}
+
+	\begin{frame}
+		{Dimostrazione della Proposizione~\ref{prop:formule_momenti}$\qquad$ 3/4}
+		
+		\begin{block}{}
+			\begin{enumerate}
+				\setcounter{enumi}{2}
+				\item Si ha 
+				\vspace*{-\baselineskip}
+				\begin{align*}
+					\Sigma_{t,t+1}&=\Cov{\sum_{m=1}^N V_{t}^{(m)},\sum_{m'=1}^N V_{t+1}^{(m')}}=\smashoperator[lr]{\sum_{m,m'}}\Cov{V_t^{(m)},V_{t+1}^{(m')}}\\
+					&=\sum_{m=m'}\Cov{V_t^{(m)},V_{t+1}^{(m)}}+\sum_{m\ne m'}\Cov{V_t^{(m)},V_{t+1}^{(m')}}=
+				\intertext{per indipendenza si ha}
+					&=\sum_{m=m'}\Cov{V_t^{(m)},V_{t+1}^{(m)}}+0=N\cdot\Cov{V_t,V_{t+1}} .
+				\end{align*}
+				Dunque $\Sigma_{t,t+1}=N\cdot\Cov{V_t,V_{t+1}}=N\cdot\qty(\mathbb{E}\qty[V_t\transpose{V_{t+1}}]-\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}}).$
+				\smallskip
+
+				Procedendo in maniera analoga al punto precedente si dimostra che 
+				\vspace*{-0.25\baselineskip}
+				\[
+					\mathbb{E}\qty[V_t\transpose{V_{t+1}}]_{i,j}=\P{V_t(i)=1,V_{t+1}(j)=1}=\vb*{\mu}_{t,t+1}(i,j)
+				\]
+				%\vspace*{-0.5\baselineskip}
+				da cui segue che $\Sigma_{,t+1}=N\cdot\qty(\vb*{\mu}_{t,t+1}-\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}}).$
+			\end{enumerate}			
+		\end{block}
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_1}{\faHandPointLeft}}
+	\end{frame}
+
+	\begin{frame}
+		{Dimostrazione della Proposizione~\ref{prop:formule_momenti}$\qquad$ 4/4}
+
+		\begin{block}{}
+			\begin{enumerate}
+				\setcounter{enumi}{3}
+				\item Si ha che $\Lambda_{t}=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]$ per definizione,
+				ma 
+				\begin{align*}
+					\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]&=\Var{\vb*{n}_t}+\mathbb{E}\qty[\vb*{n}_t]\cdot\mathbb{E}\qty[\transpose{\vb*{n}_t}]\\
+					&=\Sigma_t+N^2\cdot\vb*{\mu}_t\transpose{\vb*{\mu}_t}=N\cdot\qty(\operatorname{Diag}(\vb*{\mu}_t)+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})
+				\end{align*}
+				\item Per definizione $\Lambda_{t,t+1}=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]$, 
+				quindi identicamente al punto precedente
+				\begin{align*}
+					\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]&=\Cov{\vb*{n}_t,\vb*{n}_{t+1}}+\mathbb{E}\qty[\vb*{n}_t]\cdot\mathbb{E}\qty[\transpose{\vb*{n}_{t+1}}]\\
+					&=\Sigma_{t,t+1}+N^2\cdot\vb*{\mu}_t\transpose{\vb*{\mu}_{t,t+1}}\\
+					&=N\cdot\qty(\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})
+				\end{align*}
+			\end{enumerate}%\qedsymbol
+			ossia la tesi.\hfill\qedsymbol
+		\end{block}
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_1}{\faHandPointLeft}}		
+	\end{frame}
+
+	\begin{frame}
+		{\hypertarget{frame:dim_prop_2:appendice}{Dimostrazione $P=\Lambda_t^{-1}\Lambda_{t,t+1}\qquad 1/2$}}
+	
+		\begin{block}{Dimostrazione.}
+			$\Lambda_t=N\cdot\qty(\operatorname{Diag}\qty(\vb*{\mu}_t)+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
+			è somma di una matrice invertibile e di una matrice di rango 1, dunque è invertibile.
+
+			Esiste un'espressione esplicita per $\Lambda_t$ (formula di Sherman-Morrison): 
+			denotando $D\equiv\operatorname{Diag}\qty(\vb*{\mu}_t)$ e con $\vb*{e}$ il 
+			vettore con tutte le entrate uguali a $1$,
+			\begin{align*}
+				\Lambda_t^{-1}&=\frac{1}{N}\qty(D+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})^{-1}\\
+				&=\frac{1}{N}\qty(D^{-1}-\frac{(N-1)D^{-1}\vb*{\mu}_t\transpose{\vb*{\mu}_t}D^{-1}}{1+(N-1)\transpose{\vb*{\mu}_t}D^{-1}\vb*{\mu}_t})\\
+				&=\frac{1}{N}\qty(D^{-1}-\frac{N-1}{N}\vb*{e}\transpose{\vb*{e}})
+			\end{align*}
+			Infatti $D^{-1}\vb*{\mu}_t=\vb*{e}$, e poiché 
+			$\vb*{\mu}_t$ è un vettore stocastico $\langle\vb*{e},\vb*{\mu}_t\rangle=1$.
+		\end{block}
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS_as_moment}{\faHandPointLeft}}
+	\end{frame}
+
+	\begin{frame}
+		{\hypertarget{frame:dim_prop_2:appendice}{Dimostrazione $P=\Lambda_t^{-1}\Lambda_{t,t+1}\qquad 2/2$}}
+		
+			\begin{block}{}
+				Dimostriamo dunque che $\Lambda_tP=\Lambda_{t,t+1}$:
+				\begin{align*}
+					\Lambda_tP&=N\qty(D+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})P\\
+					&=N\qty(DD^{-1}\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t}P)\\
+					&=N\qty(\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})=\Lambda_{t,t+1}
+				\end{align*}
+				ossia la tesi.\hfill\qedsymbol
+			\end{block}
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS_as_moment}{\faHandPointLeft}}
+	\end{frame}
 
 
 
