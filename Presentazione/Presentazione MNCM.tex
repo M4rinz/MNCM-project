@@ -94,34 +94,40 @@
 %\titlegraphic{\includegraphics[width=2cm]{Immagini/cherubino_black.eps}}
 \date[\today]{Metodi Numerici per le Catene di Markov\newline Seminario di fine corso}
 
-\AtBeginSubsection[] 						
-{
-	\begin{frame}
-		\frametitle{Sommario}
-		\tableofcontents[currentsection,subsectionstyle=show/shaded/hide] 
-	\end{frame}
+%\AtBeginSubsection[] 						
+%{
+%	\begin{frame}
+%		\frametitle{Sommario}
+%		\tableofcontents[currentsection,subsectionstyle=show/shaded/hide] 
+%	\end{frame}
+%}
+
+%% ----------- ALTERNATIVA -----------
+% Custom command to insert the summary frame
+\newcommand{\insertSummaryFrame}{
+    \begin{frame}
+        \frametitle{Sommario}
+        \tableofcontents[currentsection, subsectionstyle=show/shaded/hide]
+    \end{frame}
 }
 
-%%% ----------- ALTERNATIVA -----------
-%% Custom command to insert the summary frame
-%\newcommand{\insertSummaryFrame}{
-%    \begin{frame}
-%        \frametitle{Sommario}
-%        \tableofcontents[currentsection, subsectionstyle=show/shaded/hide]
-%    \end{frame}
-%}
-%
-%% Show summary at the beginning of each section
-%\AtBeginSection[]
-%{
-%    \insertSummaryFrame
-%}
-%
-%% Show summary at the beginning of each subsection
-%\AtBeginSubsection[]
-%{
-%    \insertSummaryFrame
-%}
+% Show summary at the beginning of each section
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Sommario}
+        \tableofcontents[currentsection, subsectionstyle=show/hide/hide]
+    \end{frame}
+}
+
+% Show summary at the beginning of each subsection
+\AtBeginSubsection[]
+{
+    \begin{frame}
+        \frametitle{Sommario}
+        \tableofcontents[currentsection, subsectionstyle=show/shaded/hide]
+    \end{frame}
+}
 
 
 \begin{document}
@@ -374,7 +380,7 @@
 
 		Dunque con osservazioni rumorose
 		\[
-			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+V)^{-1}\Lambda_{t,t+1}\xcancel{\overset{T\to\infty}{\longrightarrow}P}
+			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+V)^{-1}\hat{\Lambda}_{t,t+1}\xcancel{\overset{T\to\infty}{\longrightarrow}P}
 		\]
 		ossia $\hat{P}_{\textup{CLS}}$ non è consistente con osservazioni rumorose.
 
@@ -386,6 +392,20 @@
 		Ricordiamo che $P=\operatorname{Diag}\qty(\vb*{\mu}_t)^{-1}\cdot\vb*{\mu}_{t,t+1}$.
 		Lo stimatore dei momenti si ottiene sostituendo a $\vb*{\mu}_t,\vb*{\mu}_{t,t+1}$
 		le loro stime empiriche: 
+        \begin{itemize}
+            \item $\mathbf{\vb*{\mu}_t}:$ Dalla proposizione~\ref{prop:formule_momenti} {\smaller (e poiché $\vb*{\mu}_t$ è un vettore stocastico)} segue che $\vb*{\mu}_t=\frac{\vb*{m}_t}{\norm{\vb*{m}_t}_1}$. Dunque 
+            \[
+                \hat{\vb*{\mu}}_t=\frac{\hat{\vb*{m}}_t}{\norm{\hat{\vb*{m}}_t}_1}.
+            \]
+            $\hat{\vb*{m}}_t\coloneqq\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}$ è il valore atteso empirico.
+            \item $\mathbf{\vb*{\mu}_{t,t+1}}:$ La proposizione~\ref{prop:formule_momenti} suggerisce
+            \[
+                \hat{\vb*{\mu}}_{t,t+1}=\frac{1}{N}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}},
+            \]
+            dove 
+            $\hat{\Sigma}_{t,t+1}\coloneqq\frac{1}{K}\sum_{k=1}^K\mathsmaller{ \qty(\vb*{y}_t^{(k)}-\hat{\vb*{\mu}}_t)\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{\mu}}_{t+1})}$ è la covarianza empirica.
+        \end{itemize}
+        Otteniamo dunque $\hat{P}_{\textup{MoM}}\coloneqq\operatorname{Diag}\qty(\hat{\vb*{\mu}}_t)^{-1}\qty(N^{-1}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}})$
 	\end{frame}
 
 
