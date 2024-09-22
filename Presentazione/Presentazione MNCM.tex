@@ -15,6 +15,9 @@
 
 \usepackage{mathdots}
 
+%\usepackage{algorithm}
+%\usepackage[beginLComment=//~,endLComment=~]{algpseudocodex}			% Package for typesetting algorithms
+
 \usepackage{mathrsfs}					% Per dei caratteri matematici migliori: \mathscr{} e \mathcal{}
 %\usepackage{braket} 					% Per il comando \Set, e altre (poche) cose
 %\usepackage{textcomp}					% Dovrebbe aggiungere più simboli
@@ -77,6 +80,14 @@
 % Define the \independent symbol, for independence
 \newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
     \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+%% Rename keywords for algorithms
+%\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+%\algrenewcommand\algorithmicensure{\textbf{Output:}}
+
+
+
+
 
 	%COLORI
 \definecolor{madridlightblue}{RGB}{233, 233, 243}
@@ -147,7 +158,7 @@
 
 
 \section{Introduzione, notazione e prime definizioni}
-	\subsection*{prova}
+	\subsection{Descrizione del problema}
 
 	\begin{frame}{Introduzione al problema, notazione, modello 1/2}%{Descrizione del contesto}
 		Supponiamo di avere una popolazione di $N\in\mathbb{N}_{>0}$ individui che evolvono da 
@@ -216,6 +227,9 @@
 		\end{alertblock}
 
 	\end{frame}
+
+
+	\subsection{Osservazioni su \texorpdfstring{$\vb*{n}_t$}{n_t} e su \texorpdfstring{$P$}{P}}
 
 	\begin{frame}
 		{\hypertarget{frame:dettagli_nt}{Osservazioni su $\vb*{n}_t$ e su $P$}}
@@ -348,7 +362,7 @@
 			\hat{\Lambda}_t&\coloneqq\frac{1}{T-1}\transpose{X}X=\frac{1}{T-1}\sum_{t=1}^{T-1}\vb*{n}_t\transpose{\vb*{n}_t}\qquad\text{e}\\
 			\hat{\Lambda}_{t,t+1}&\coloneqq\frac{1}{T-1}\transpose{X}Y=\frac{1}{T-1}\sum_{t=1}^{T-1}\vb*{n}_t\transpose{\vb*{n}_{t+1}},
 		\end{align*}
-		si ha $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t\hat{\Lambda}_{t,t+1}$.}
+		si ha $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t^{-1}\hat{\Lambda}_{t,t+1}$.}
 		\smallskip
 
 		\onslide<3->{$\hat{\Lambda}_t$ e $\hat{\Lambda}_{t,t+1}$ si possono interpretare come 
@@ -357,7 +371,7 @@
 		$\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]=\Lambda_{t,t+1}$ rispettivamente.}
 		\smallskip
 
-		\onslide<4->{Dunque $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t\hat{\Lambda}_{t,t+1}$ 
+		\onslide<4->{Dunque $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t^{-1}\hat{\Lambda}_{t,t+1}$ 
 		ha un'interpretazione come stimatore ottenuto con il \emph{metodo dei momenti}.} 
 
 	\end{frame}
@@ -371,41 +385,84 @@
 		%$\Var{\epsilon_t}=<\infty\quad\forall\,t\ne t'$. 
 
 		Supponiamo $\vb*{y}_t=\vb*{n}_t+\epsilon_t$, con 
-		$\mathbb{E}\qty[\epsilon_t]=0$, $\Var{\epsilon_t}=<\infty\quad\forall\,t\in[T]$,
+		$\mathbb{E}\qty[\epsilon_t]=0$, $\Var{\epsilon_t}<\infty\quad\forall\,t\in[T]$,
 		e $\epsilon_t\independent\epsilon_{t'}\quad\forall\,t\ne t'$.
 		
-		Si ha $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_t}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]+\Var{\epsilon_t}$,
-		e $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_{t+1}}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]$.
+		\onslide<2->{Si ha $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_t}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]+\Var{\epsilon_t}$,
+		e $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_{t+1}}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]$.}
 		\smallskip
 
-		Dunque con osservazioni rumorose
+		\onslide<3->{Dunque con osservazioni rumorose
 		\[
 			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+V)^{-1}\hat{\Lambda}_{t,t+1}\xcancel{\overset{T\to\infty}{\longrightarrow}P}
 		\]
-		ossia $\hat{P}_{\textup{CLS}}$ non è consistente con osservazioni rumorose.
+		ossia $\hat{P}_{\textup{CLS}}$ non è consistente con osservazioni rumorose.}
+		\smallskip
 
-		Il prossimo stimatore sarà consistente anche con osservazioni rumorose.
+		\onslide<4->{Il prossimo stimatore sarà consistente anche con osservazioni rumorose.}
 	\end{frame}
 
 	\begin{frame}
 		{Lo stimatore dei momenti}
 		Ricordiamo che $P=\operatorname{Diag}\qty(\vb*{\mu}_t)^{-1}\cdot\vb*{\mu}_{t,t+1}$.
-		Lo stimatore dei momenti si ottiene sostituendo a $\vb*{\mu}_t,\vb*{\mu}_{t,t+1}$
-		le loro stime empiriche: 
+		\onslide<2->{Lo stimatore dei momenti si ottiene sostituendo a 
+		$\vb*{\mu}_t,\vb*{\mu}_{t,t+1}$ le loro stime empiriche:} 
         \begin{itemize}
-            \item $\mathbf{\vb*{\mu}_t}:$ Dalla proposizione~\ref{prop:formule_momenti} {\smaller (e poiché $\vb*{\mu}_t$ è un vettore stocastico)} segue che $\vb*{\mu}_t=\frac{\vb*{m}_t}{\norm{\vb*{m}_t}_1}$. Dunque 
+            \item<2-> $\mathbf{\vb*{\mu}_t}:$ Dalla proposizione~\ref{prop:formule_momenti} {\smaller (e poiché $\vb*{\mu}_t$ è un vettore stocastico)} segue che $\vb*{\mu}_t=\frac{\vb*{m}_t}{\norm{\vb*{m}_t}_1}$. 
+			\onslide<3->{Dunque 
             \[
                 \hat{\vb*{\mu}}_t=\frac{\hat{\vb*{m}}_t}{\norm{\hat{\vb*{m}}_t}_1}.
-            \]
-            $\hat{\vb*{m}}_t\coloneqq\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}$ è il valore atteso empirico.
-            \item $\mathbf{\vb*{\mu}_{t,t+1}}:$ La proposizione~\ref{prop:formule_momenti} suggerisce
+            \]}
+            \onslide<4->{$\hat{\vb*{m}}_t\coloneqq\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}$ è 
+			il valore atteso empirico.}
+            \item<5-> $\mathbf{\vb*{\mu}_{t,t+1}}:$ La proposizione~\ref{prop:formule_momenti} suggerisce
             \[
                 \hat{\vb*{\mu}}_{t,t+1}=\frac{1}{N}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}},
             \]
             dove 
             $\hat{\Sigma}_{t,t+1}\coloneqq\frac{1}{K}\sum_{k=1}^K\mathsmaller{ \qty(\vb*{y}_t^{(k)}-\hat{\vb*{\mu}}_t)\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{\mu}}_{t+1})}$ è la covarianza empirica.
         \end{itemize}
-        Otteniamo dunque $\hat{P}_{\textup{MoM}}\coloneqq\operatorname{Diag}\qty(\hat{\vb*{\mu}}_t)^{-1}\qty(N^{-1}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}})$
+        \onslide<6->{Otteniamo dunque $\hat{P}_{\textup{MoM}}\coloneqq\operatorname{Diag}\qty(\hat{\vb*{\mu}}_t)^{-1}\qty(N^{-1}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}})$}
+	\end{frame}
+
+	\begin{frame}
+		{\hypertarget{frame:prop_noise_model}{Modelli di rumore}}
+		Per poter usare con successo $\hat{P}_{\textup{MoM}}$ con osservazioni rumorose,
+		dobbiamo poter ricavare i momenti di $\vb*{n}$ a partire dai momenti di $\vb*{y}$.
+
+		%Perché...
+		
+		La proposizione~\ref{prop:noise_model} delinea un'ampia classe di modelli 
+		di rumore che permettono di fare ciò:
+		\begin{proposizione}\label{prop:noise_model}
+			Supponiamo che il modello di rumore $\P{\vb*{y}}{\vb*{n}}$ soddisfi le seguenti
+			due condizioni:
+			\begin{enumerate}
+				\item $\vb*{y}_t\independent\vb*{y}_s\qquad\forall\,t\ne s\in[T]\quad$ {\smaller (rumore indipendente)}
+				\item $\mathbb{E}\qty[\vb*{y}_t\mid\vb*{n}_t]=A_t\vb*{n}_t,\quad$ dove $A_t\in\R{S}{S}$ è una 
+				matrice \emph{invertibile} nota.
+			\end{enumerate}
+			Allora valgono le seguenti relazioni:
+			\begin{enumerate}
+				\item $\mathbb{E}\qty[\vb*{n}_t]=A_t^{-1}\cdot\mathbb{E}\qty[\vb*{y}_t]\qquad\forall\,t\in[T]$
+				\item $\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]=A_s^{-1}\cdot\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
+				\item $\Cov{\vb*{n}_s,\vb*{n}_t}=A_s^{-1}\cdot\Cov{\vb*{y}_s,\vb*{y}_t}\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
+			\end{enumerate}
+		\end{proposizione}
+		\begin{proof}
+			Cfr. Appendice~\hyperlink{frame:dim_prop_noise_model:appendice}{\faHandPointRight}
+		\end{proof}
+	\end{frame}
+
+	\begin{frame}[fragile]
+		{Algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$}
+
+		\begin{figure}[ht]
+			\centering
+			\includegraphics[width=0.65\textwidth]{Immagini/algorithm_nonstationary.png}
+			%\caption{\emph{Algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$}}
+		\end{figure}
+		
 	\end{frame}
 
 
@@ -671,7 +728,7 @@
 	\end{frame}
 
 	\begin{frame}
-		{\hypertarget{frame:dim_prop_2:appendice}{Dimostrazione $P=\Lambda_t^{-1}\Lambda_{t,t+1}\qquad 2/2$}}
+		{Dimostrazione $P=\Lambda_t^{-1}\Lambda_{t,t+1}\qquad 2/2$}
 		
 			\begin{block}{}
 				Dimostriamo dunque che $\Lambda_tP=\Lambda_{t,t+1}$:
@@ -684,6 +741,34 @@
 			\end{block}
 
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS_as_moment}{\faHandPointLeft}}
+	\end{frame}
+
+
+	\begin{frame}
+		{\hypertarget{frame:dim_prop_noise_model:appendice}{Dimostrazione della proposizione~\ref{prop:noise_model}}}
+
+		\begin{proof}
+			\begin{enumerate}
+				\item $\mathbb{E}\qty[\vb*{y}_t]=\mathbb{E}\qty[\,\mathbb{E}\qty[\vb*{y}_t\mid\vb*{n}_t]\,]=\mathbb{E}\qty[A_t\vb*{n}_t]=A_t\cdot\mathbb{E}\qty[\vb*{n}_t]$
+				\item Si ha 
+				\begin{align*}
+					\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]&=\mathbb{E}\qty[\,\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}\mid \vb*{n}_s,\vb*{n}_t]\,]
+					=\mathbb{E}\qty[\,\mathbb{E}\qty[\vb*{y}_s\mid \vb*{n}_s,\vb*{n}_t]\cdot\mathbb{E}\qty[\transpose{\vb*{y}_t}\mid\vb*{n}_s,\vb*{n}_t]\,]\\
+					&=\mathbb{E}\qty[\,\mathbb{E}\qty[\vb*{y}_s\mid \vb*{n}_s]\cdot\mathbb{E}\qty[\transpose{\vb*{y}_t}\mid\vb*{n}_t]\,]
+					=\mathbb{E}\qty[\,A_s\cdot\vb*{n}_s\transpose{\vb*{n}_t}\cdot\transpose{A_t}\,]\\
+					&=A_s\cdot\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]\cdot\transpose{A_t}
+				\end{align*}
+				\item Si ha, per i due punti precedenti,
+				\begin{align*}
+					\Cov{\vb*{y}_s,\vb*{y}_t}&=\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]-\mathbb{E}\qty[\vb*{y}_s]\cdot\mathbb{E}\qty[\transpose{\vb*{y}_t}]\\
+					&=\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]-A_s\cdot\mathbb{E}\qty[\vb*{y}_t]\mathbb{E}\qty[\transpose{\vb*{y}_t}]\cdot\transpose{A_t}\\
+					&=A_s\cdot\qty(\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]-\mathbb{E}\qty[\vb*{y}_t]\mathbb{E}\qty[\transpose{\vb*{y}_t}])\cdot\transpose{A_t}
+				\end{align*}
+			\end{enumerate}
+			Dall'invertibilità di $A_s$ e $A_t$ segue la tesi.
+		\end{proof}
+
+		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_noise_model}{\faHandPointLeft}}
 	\end{frame}
 
 
