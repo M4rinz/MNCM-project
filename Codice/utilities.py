@@ -26,7 +26,7 @@ def generate_random_P(S:int,*args,**kwargs) -> np.ndarray:
     P = np.zeros(shape=(S,S))
     if args and (args[0] == 'dirichlet' or args[0] == 'Dirichlet'):
         # we parameterize the distribution like the authors did
-        D = kwargs['precision']
+        D = kwargs.get('precision', kwargs.get('parameter'))
         P = np.random.dirichlet(D*np.ones(S)/S,S)
     else:
         P = np.random.rand(S,S)
@@ -74,7 +74,7 @@ def add_noise(n_t:np.ndarray,
                 the original input will be returned.")
         return (n_t,np.eye(S))
 
-
+# Basically, this has to be refactored
 def sanity_checks(K:int, N:int, S:int,
                   y_t_array:Iterable[np.ndarray],
                   A1:np.ndarray, A2:np.ndarray):
@@ -111,16 +111,26 @@ def sanity_checks(K:int, N:int, S:int,
 
 #TODO incorporate sanity checks
 def P_mom_nonstationary(
-        y_t_array:Iterable[np.ndarray],
-        y_tp1_array:Iterable[np.ndarray],
+        y_t_array:np.ndarray,
+        y_tp1_array:np.ndarray,
         A_t:np.ndarray,
         A_tp1:np.ndarray,
         N:int) -> np.ndarray:
-    '''
-        Comment the code here. #TODO
-    '''
-    K = len(y_t_array)
-    S = A_t.shape[0]
+    """Computes the method of moments approximation of the transition
+    matrix P of a Markov chain, using noisy aggregated data from
+    specific timesteps t and t+1.
+
+    Args:
+        y_t_array (np.ndarray): K by S array with the noisy aggregated observations at time t, y_t
+        y_tp1_array (np.ndarray): K by S array with the noisy aggregated observations at time t+1, y_{t+1}
+        A_t (np.ndarray): S by S matrix of the conditional expectation of the original aggregated data n_t given y_t
+        A_tp1 (np.ndarray): S by S matrix of the conditional expectation of the original aggregated data n_{t+1} given y_{t+1}
+        N (int): number of individuals in the population
+
+    Returns:
+        np.ndarray: the estimation of the transition matrix
+    """
+    K,S = y_t_array.shape
 
     #TODO: improve this
     sanity_checks(K,N,S,y_t_array,A_t,A_tp1)
@@ -143,7 +153,7 @@ def P_mom_nonstationary(
         # Other formulation with broadcasting
     deviations_t = y_t_array - m_t_hat
     deviations_tp1 = y_tp1_array - m_tp1_hat
-    Sigma_t_tp1_hat = np.dot(deviations_t.T,deviations_tp1)/K
+    Sigma_t_tp1_hat = np.matmul(deviations_t.T,deviations_tp1)/K
     # Correction with error matrices as of proposition 3
     # (i.e. Sigma_t_tp1_hat = A_t^-1*Sigma_t_tp1_hat*A_tp1^-1)
     Sigma_t_tp1_hat = np.linalg.solve(A_t,Sigma_t_tp1_hat)
@@ -155,5 +165,46 @@ def P_mom_nonstationary(
     return P_mom_t
 
 
+def P_mom_stationary(
+        y_array:np.ndarray,
+        A:np.ndarray,
+        N:int) -> np.ndarray:
+    """Computes the method of moments approximation of the transition
+    matrix P of a Markov chain, using noisy aggregated data from
+    all timesteps (strongly stationary case).
 
+    Args:
+        y_array (np.ndarray): array of shape (T,K,S) with the noisy aggregated observations
+        A (np.ndarray): S by S matrix of the conditional expectation of the original aggregated data n given y
+        N (int): number of individuals in the population
+
+    Returns:
+        np.ndarray: the estimation of the transition matrix
+    """
+    _, K, _ = y_array.shape
+
+    #sanity_checks(K,N,S,)
+
+    # estimate mean of noisy data
+    # (aka compute empirical expectations along T and K)
+    m_t_hat = y_array.mean(axis=(0,1))
+
+    # estimate mean of true counts
+    # (aka multiply by A^-1, as of proposition 3)
+    m_t_hat = np.linalg.solve(A,m_t_hat)
+
+    # Normalize
+    mu_hat = m_t_hat/m_t_hat.sum()
+
+    # estimate time-lagged covariance of noisy counts
+    deviations = y_array - m_t_hat
+    Sigma_hat = np.matmul(deviations[:-1].transpose(0,2,1),deviations[1:]).mean(axis=0)/K
+    # estimate time-lagged covariance of true counts
+    Sigma_hat = np.linalg.solve(A,Sigma_hat)
+    Sigma_hat = np.linalg.solve(A,Sigma_hat.T).T
+
+    # Estimate transition matrix
+    P_mom = ((Sigma_hat/N+np.outer(mu_hat,mu_hat)).T/mu_hat).T
+
+    return P_mom
 
