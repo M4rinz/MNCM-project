@@ -1,0 +1,141 @@
+\documentclass[10pt,xcolor={table,dvipsnames}]{beamer} 		% carica automaticamente amsthm, amssymb, amsmath, graphicx
+\setbeamertemplate{theorems}[numbered]%[ams style] 
+
+
+\usepackage[T1]{fontenc}				% codifica dei font
+\usepackage[utf8]{inputenc}				% lettere accentate da tastiera
+\usepackage[italian]{babel}				% lingua del documento
+\usepackage[italian]{varioref}			% Per usare il comando \vref{label}, che dà dei collegamenti più dettagliati
+
+% Load the custom style file
+\usepackage{AndreaStyle}
+% The file `AndreaStyle.sty` is stored in: `D:\Programmi e Applicazioni\texlive\texmf-local\tex\latex\local` for Windows.
+% The file `AndreaStyle.sty` is stored in: `/usr/local/texlive/texmf-local/tex/latex/local` for Ubuntu (desktop).
+% This won't work in Overleaf, until the AndreaStyle.sty file is added to the project
+
+\usepackage{mathdots}
+
+%\usepackage{algorithm}
+%\usepackage[beginLComment=//~,endLComment=~]{algpseudocodex}			% Package for typesetting algorithms
+
+\usepackage{mathrsfs}					% Per dei caratteri matematici migliori: \mathscr{} e \mathcal{}
+%\usepackage{braket} 					% Per il comando \Set, e altre (poche) cose
+%\usepackage{textcomp}					% Dovrebbe aggiungere più simboli
+%\usepackage{bbm}						% Più simboli in \mathbb
+
+\usepackage{fontawesome5}				% Aggiunge simboli da FontAwesome
+
+\usepackage{hyperref}					% Importante: hyperref va caricato nel documento.
+
+
+%\setcounter{tocdepth}{1}	% profondità dell'indice
+
+	    % TEOREMI CUSTOM:
+\theoremstyle{plain}					% Definisce ambienti per Teoremi, esercizi, corollari... Con lo stile adeguato
+	\newtheorem{proposizione}{Proposizione}%[section]
+	\newtheorem*{proposizione*}{Proposizione}
+	
+	\newtheorem{teorema}{Teorema}%[section]
+	\newtheorem*{teorema*}{Teorema}
+		
+	%\newtheorem{lemma_es}{Lemma}[esercizio]
+	%\newtheorem{lemma}{Lemma}[section]
+	\newtheorem*{lemma*}{Lemma}
+	\newtheorem{corollario}{Corollario}[section]
+
+
+\theoremstyle{definition}				
+	\newtheorem{definizione}{Definizione}%[section]%[chapter]
+	\newtheorem*{definizione*}{Definizione}	%definizione non numerata
+	\newtheorem*{notazione}{Notazione}
+
+\theoremstyle{remark}
+	\newtheorem{oss}{Osservazione}%[section]
+	\newtheorem*{oss*}{Osservazione}
+
+
+    	% COMANDI CUSTOM
+% Define the \indicator command
+\NewDocumentCommand{\indicator}{O{t} O{m} O{i}}{%
+\mathlarger{\mathbbm{1}}\qty{\scriptstyle {x}_{#1}^{#2}=#3}%
+}
+% Define the \transpose command
+\newcommand{\transpose}[1]{\prescript{t}{}{#1}}
+% Define the \Var command, for the variance
+\newcommand{\Var}[1]{\operatorname{Var}\qty(#1)}
+% Define the \Cov command, for the covariance
+\newcommand{\Cov}[1]{\operatorname{Cov}\qty(#1)}
+
+% Define a command to create unnumbered footnotes
+\let\svthefootnote\thefootnote
+\textheight 1in
+\newcommand\blankfootnote[1]{%
+\let\thefootnote\relax\footnotetext{#1}%
+\let\thefootnote\svthefootnote%
+}
+% Define the \independent symbol, for independence
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+  \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+
+
+\title[Seminario MNCM]{Slide di appoggio}			%WIP
+%\subtitle{Presentazione e dimostrazione della convergenza} 
+\author{Andrea Marino}
+\institute[DI UniPi]{Università di Pisa}
+%\titlegraphic{\includegraphics[width=2cm]{Immagini/cherubino_black.eps}}
+\date[\today]{Metodi Numerici per le Catene di Markov\newline Seminario di fine corso}
+
+
+% Custom command to insert the summary frame
+\newcommand{\insertSummaryFrame}{
+    \begin{frame}
+        \frametitle{Sommario}
+        \tableofcontents[currentsection, subsectionstyle=show/shaded/hide]
+    \end{frame}
+}
+
+% Show summary at the beginning of each section
+\AtBeginSection[]
+{
+    \begin{frame}
+        \frametitle{Sommario}
+        \tableofcontents[currentsection, subsectionstyle=show/hide/hide]
+    \end{frame}
+}
+
+% Show summary at the beginning of each subsection
+\AtBeginSubsection[]
+{
+    \begin{frame}
+        \frametitle{Sommario}
+        \tableofcontents[currentsection, subsectionstyle=show/shaded/hide]
+    \end{frame}
+}
+
+\begin{document}
+    \begin{frame}[plain]
+        \titlepage
+    \end{frame}
+
+\section*{Sommario}
+	\setcounter{tocdepth}{1}
+	\begin{frame}
+		\frametitle{Sommario}
+		\tableofcontents
+	\end{frame}
+	
+	\setcounter{tocdepth}{2}  
+    
+\section{Analisi teorica}
+
+    \begin{frame}
+        {}
+
+        %Supponiamo che:
+        %\begin{enumerate}
+        %    \item $\pi_0=\pi$, ossia $\qty{x_t^{(m)}}_{t\in[T]}$ è \emph{fortemente} stazionario
+        %\end{enumerate}
+    \end{frame}
+
+\end{document}
