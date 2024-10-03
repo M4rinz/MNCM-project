@@ -1,25 +1,9 @@
 import numpy as np
-from typing import Iterable
-
-#def generate_random_y_t_array(K:int, N:int, S:int) -> np.ndarray:
-#    '''
-#    Generate K vectors of length S,
-#    with non-negative elements summing to N.
-#    '''
-#    y_t_array = []
-#    for _ in range(K):
-#        vector = np.zeros(S)
-#        vector[:S-1] = np.random.randint(0, N, S-1)
-#        vector = vector / vector.sum() * N
-#        vector = np.floor(vector)
-#        vector[S-1] = N - vector[:S-1].sum()
-#        vector = vector.astype(float)
-#        y_t_array.append(vector)
-#    return np.array(y_t_array)
+#from typing import Iterable
 
 def generate_random_P(S:int,*args,**kwargs) -> np.ndarray:
     '''
-    Generate a random stochastic matrix of size S by S
+    Generate a random stochastic matrix of size S by S\n
     P = generate_random_P(S,'dirichlet',precision) to use Dirichlet 
     distributions, like the authors did.
     '''
@@ -75,9 +59,10 @@ def add_noise(n_t:np.ndarray,
         return (n_t,np.eye(S))
 
 # Basically, this has to be refactored
-def sanity_checks(K:int, N:int, S:int,
-                  y_t_array:Iterable[np.ndarray],
-                  A1:np.ndarray, A2:np.ndarray):
+def sanity_checks_stationary(
+        K:int, N:int, S:int,
+        y_t_array:np.ndarray,
+        A1:np.ndarray, A2:np.ndarray):
     # A1 and A2 must be S by S
     c1 = A1.shape == (S,S) and A2.shape == (S,S)
     # Each observation y_t must be a np.ndarray
@@ -107,6 +92,30 @@ def sanity_checks(K:int, N:int, S:int,
     # If all conditions are True, print a success message
     if c1 and c2 and c3 and c4:
         print("All sanity checks passed successfully.")
+
+
+def sanity_checks_nonstationary(
+        K:int, N:int, S:int,
+        y_t:np.ndarray, y_tp1:np.ndarray,
+        A1:np.ndarray, A2:np.ndarray):
+    # A1 and A2 must be S by S
+    c1 = A1.shape == (S,S) and A2.shape == (S,S)
+    # y_t and y_{t+1} must be K by S np.ndarray
+    c2 = False if not (isinstance(y_t,np.ndarray) and isinstance(y_tp1,np.ndarray)) else (y_t.shape==(K,S) and y_tp1.shape==(K,S))
+    # Each of the K observations must be a nonnegative vector summing to N
+    c3_1 = all([all(y_t[k,:]>=0) and y_t[k,:].sum()==N for k in range(K)])
+    c3_2 = all([all(y_tp1[k,:]>=0) and y_tp1[k,:].sum()==N for k in range(K)])
+    c3 = c3_1 and c3_2
+
+    if not c1:
+        print("Either A1 or A2 (or both) aren't of size S by S")
+    if not c2: 
+        print("The observations must be of type np.ndarray and dimension K by S")
+    if not c3:
+        print("Each of the K observations must be a nonnegative vector summing to N")
+
+    if c1 and c2 and c3:
+        print("All sanity checks passed successfully.")
     
 
 #TODO incorporate sanity checks
@@ -132,8 +141,10 @@ def P_mom_nonstationary(
     """
     K,S = y_t_array.shape
 
-    #TODO: improve this
-    sanity_checks(K,N,S,y_t_array,A_t,A_tp1)
+    #TODO: improve this (exceptions?)
+    #TODO: can't have sum-to-N constraint
+    #TODO Drop sanity checks???
+    #sanity_checks_nonstationary(K,N,S,y_t_array,y_tp1_array,A_t,A_tp1)
 
     # estimate mean of noisy data for timestep t
     # (aka compute the empirical expectation)
@@ -183,7 +194,7 @@ def P_mom_stationary(
     """
     _, K, _ = y_array.shape
 
-    #sanity_checks(K,N,S,)
+    #sanity_checks_stationary(K,N,S,)
 
     # estimate mean of noisy data
     # (aka compute empirical expectations along T and K)
@@ -208,3 +219,49 @@ def P_mom_stationary(
 
     return P_mom
 
+
+# TODO: fix this!!
+def create_observations(T:int, K:int, N:int,
+                        pi_0:np.ndarray,
+                        stationary:bool,
+                        *args,**kwargs) -> tuple[np.ndarray]:
+    """Creates aggregate observations (noisy and not noisy)
+    from a Markov chain with given parameters
+
+    Args:
+        T (int): n° of timesteps
+        K (int): n° of repeated observations
+        N (int): population size
+        pi_0 (np.ndarray): initial distribution
+        stationary (bool): if the Markov process is strictly stationary
+        (i.e. if pi_0 is the steady-state vector)
+
+    Returns:
+        tuple[np.ndarray]: (true aggregate data, noisy data, noise model matrix)
+    """
+    mu_t = pi_0.T
+    n_t_vector, y_t_vector = [], []
+    #A_t_vector = []
+    for _ in range(T):
+        # create K observations of the observed data 
+        # (multinomial draw from the marginal distribution)
+        n_t = np.random.multinomial(n=N, pvals=mu_t, size=K)
+        # create noisy observations 
+        # all observations will have the same noise type
+        y_t, A_t = add_noise(n_t, *args, **kwargs)
+        # append the observations
+        n_t_vector.append(n_t)
+        y_t_vector.append(y_t)
+        # In the stationary case, the marginal distribution is equal 
+        # to the stationary distribution
+        if not stationary:
+            # update the distribution of x_t for the next iteration
+            P = kwargs.get('P')
+            mu_t = np.dot(mu_t,P)
+    # Simplified case (same as the article):
+    # Noise model is fixed and known in advance. Parameters of the noise models are the same across time
+    # Therefore A_t is the same for all timesteps 
+    return (np.array(n_t_vector), np.array(y_t_vector), A_t)    
+    
+    
+        
