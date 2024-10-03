@@ -78,6 +78,7 @@
   \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
 
 
+\usetheme{Madrid}
 
 \title[Seminario MNCM]{Slide di appoggio}			%WIP
 %\subtitle{Presentazione e dimostrazione della convergenza} 
@@ -130,12 +131,104 @@
 \section{Analisi teorica}
 
     \begin{frame}
-        {}
+        {\hypertarget{frame:teorema_1_part1}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 1/2$}}
 
-        %Supponiamo che:
-        %\begin{enumerate}
-        %    \item $\pi_0=\pi$, ossia $\qty{x_t^{(m)}}_{t\in[T]}$ è \emph{fortemente} stazionario
-        %\end{enumerate}
+        Supponiamo che:
+        \begin{enumerate}
+            \item $\pi_0=\pi$, ossia $\qty{x_t^{(m)}}_{t\in[T]}$ è \emph{fortemente} stazionario
+            \item $\P{\vb*{y}}{\vb*{n}}$ rispetti le ipotesi della proposizione~\ref{prop:noise_model}
+            \item $N\in\mathbb{N}, A\in\R{S}{S}$ siano noti {\smaller (e costanti: forte stazionarietà $\implies A_t=A\quad\forall\,t\in[T]$)}
+        \end{enumerate}
+
+        \begin{teorema}\label{teor:consistenza_P_mom}
+            Sia $\hat{P}_{T,K}$ lo stimatore restituito dall'algoritmo per il caso stazionario.
+
+            Nelle ipotesi precedenti, $\hat{P}_{T,K}$ è consistente%, ossia converge in probabilità 
+            %a $P$ per $T\to\infty$ e/o $K\to\infty$.
+        \end{teorema}
+        \begin{block}{Dimostrazione.}
+            \begin{itemize}
+                \item ${K\to\infty}$
+                \begin{itemize}
+                    \item Per la legge dei grandi numeri, $\lim_K\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_t]$ q.c.
+                    Dunque 
+                    $\lim_K\hat{\vb*{m}}=\lim_k\frac{1}{T}\sum_{t=1}^T\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_1]$ q.c.
+                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_mhat:appencide}{\faHandPointRight})
+                    \item Similmente si dimostra che $\lim_K\hat{\Sigma}_{t,t+1}=\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
+                    e dunque $\hat{\Sigma}=\frac{1}{T-1}\sum_{t=1}^{T-1}\hat{\Sigma}_{t,t+1}\overset{K\to\infty}{\longrightarrow}\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
+                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_Sigmahat:appendice}{\faHandPointRight})
+                \end{itemize}
+                Ma allora $\hat{P}_{T,K}\overset{K\to\infty}{\longrightarrow}P$ in probabilità.
+            \end{itemize}
+        \end{block}
     \end{frame}
+
+    \begin{frame}
+        {\hypertarget{frame:teorema_1_part2}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 2/2$}}
+
+        \begin{block}{}
+            \begin{itemize}
+                \item $T\to\infty$
+                
+                Possiamo supporre $K=1$. Dunque $\hat{\vb*{m}}_t=\vb*{y}_t$ e $\hat{\vb*{m}}=\frac{1}{T}\sum_{t=1}^{T}\vb*{y}_t$
+            \end{itemize}
+        \end{block}
+
+    \end{frame}
+
+
+
+
+
+% ---------------------------------------------------------------------------------------
+% -------------------------------------- APPENDICE --------------------------------------
+% ---------------------------------------------------------------------------------------
+
+\section*{Appendice}
+	\begin{frame}
+		\begin{center}
+			\Huge{\textbf{Appendice}}
+		\end{center}
+	\end{frame}
+
+
+    \begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$K\to\infty$}{K tendente a infinito}$\qquad 1/2$}
+        {\hypertarget{frame:teorema1_lim_mhat:appencide}{Dettagli sul calcolo di \texorpdfstring{$\lim_K\hat{\vb*{m}}$}{un limite}}}
+
+        \begin{block}{}
+            Nel calcolo di $\lim_K\hat{\vb*{m}}$ si fa uso dell'ipotesi di stazionarietà:
+            \begin{align*}
+                \lim_K\hat{\vb*{m}}&=\lim_K\frac{1}{T}\sum_{t=1}^T\hat{\vb*{m}}_t=\frac{1}{T}\sum_{t=1}\
+                \lim_K\hat{\vb*{m}}_t=\frac{1}{T}\sum_{t=1}^T\mathbb{E}\qty[\vb*{y}_t]\
+                =\frac{1}{T}\sum_{t=1}^T A_t\mathbb{E}\qty[\vb*{n}_t]\\
+            \intertext{Per ipotesi $A_t=A\quad\forall\,t\in[T]$. Dunque}
+                &=\frac{1}{T}\cdot A\cdot\sum_{t=1}^T\mathbb{E}\qty[\vb*{n}_t]=\frac{1}{T}\cdot A\cdot T\cdot\mathbb{E}\qty[\vb*{n}_1]=A\cdot\mathbb{E}\qty[\vb*{n}_1]=\mathbb{E}\qty[\vb*{y}_1]
+            %\intertext{Ma per stazionarietà $\mathbb{E}\qty[\vb*{n}_t]=\mathbb{E}\qty[\vb*{n}_1]\quad\forall\,t\in[T]$. Dunque}
+            \end{align*}
+            poiché per stazionarietà $\mathbb{E}\qty[\vb*{n}_t]=\mathbb{E}\qty[\vb*{n}_1]\quad\forall\,t\in[T]$.
+            
+        \end{block}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part1}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$K\to\infty$}{K tendente a infinito}$\qquad 2/2$}
+        {\hypertarget{frame:teorema1_lim_Sigmahat:appendice}{Dettagli sul calcolo di \texorpdfstring{$\lim_k\hat{\Sigma}_{t,t+1}$}{un altro limite}}}
+
+        \begin{block}{}
+            Consideriamo 
+            \[
+                \hat{\Sigma}_{t,t+1}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}-\hat{\vb*{m}}_t)\cdot\transpose{\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{m}}_{t+1})}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}\cdot\transpose{\vb*{y}}_{t+1}^{(k)})-\hat{\vb*{m}}_t\cdot\transpose{\hat{\vb*{m}}_{t+1}}
+            \]
+            Per la legge dei grandi numeri \textcolor{red}{\textbf{FINIRE}}
+            
+        \end{block}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part1}{\faHandPointLeft}}
+    \end{frame}
+
+
 
 \end{document}

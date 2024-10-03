@@ -411,18 +411,18 @@
             \item<2-> $\mathbf{\vb*{\mu}_t}:$ Dalla proposizione~\ref{prop:formule_momenti} {\smaller (e poiché $\vb*{\mu}_t$ è un vettore stocastico)} segue che $\vb*{\mu}_t=\frac{\vb*{m}_t}{\norm{\vb*{m}_t}_1}$. 
 			\onslide<3->{Dunque 
             \[
-                \hat{\vb*{\mu}}_t=\frac{\hat{\vb*{m}}_t}{\norm{\hat{\vb*{m}}_t}_1}.
+                \hat{\vb*{\mu}}_t=\frac{\hat{\vb*{m}}_t}{\norm{\hat{\vb*{m}}_t}_1}
             \]}
-            \onslide<4->{$\hat{\vb*{m}}_t\coloneqq\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}$ è 
+            \onslide<4->{dove $\hat{\vb*{m}}_t\coloneqq\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}$ è 
 			il valore atteso empirico.}
             \item<5-> $\mathbf{\vb*{\mu}_{t,t+1}}:$ La proposizione~\ref{prop:formule_momenti} suggerisce
             \[
                 \hat{\vb*{\mu}}_{t,t+1}=\frac{1}{N}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}},
             \]
-            dove 
-            $\hat{\Sigma}_{t,t+1}\coloneqq\frac{1}{K}\sum_{k=1}^K\mathsmaller{ \qty(\vb*{y}_t^{(k)}-\hat{\vb*{\mu}}_t)\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{\mu}}_{t+1})}$ è la covarianza empirica.
+            \onslide<6->{dove 
+            $\hat{\Sigma}_{t,t+1}\coloneqq\frac{1}{K}\sum_{k=1}^K\mathsmaller{ \qty(\vb*{y}_t^{(k)}-\hat{\vb*{m}}_t)\cdot\transpose{\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{m}}_{t+1})}}$ è la covarianza empirica.}
         \end{itemize}
-        \onslide<6->{Otteniamo dunque $\hat{P}_{\textup{MoM}}\coloneqq\operatorname{Diag}\qty(\hat{\vb*{\mu}}_t)^{-1}\qty(N^{-1}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}})$}
+        \onslide<7->{Otteniamo dunque $\hat{P}_{\textup{MoM}}\coloneqq\operatorname{Diag}\qty(\hat{\vb*{\mu}}_t)^{-1}\qty(N^{-1}\hat{\Sigma}_{t,t+1}+\hat{\vb*{\mu}}_t\transpose{\hat{\vb*{\mu}}_{t+1}})$}
 	\end{frame}
 
 	\begin{frame}
@@ -432,24 +432,24 @@
 
 		%Perché...
 		
-		La proposizione~\ref{prop:noise_model} delinea un'ampia classe di modelli 
-		di rumore che permettono di fare ciò:
-		\begin{proposizione}\label{prop:noise_model}
+		\onslide<2->{La proposizione~\ref{prop:noise_model} delinea un'ampia classe di modelli 
+		di rumore che permettono di fare ciò:}
+		\begin{proposizione}<3->\label{prop:noise_model}
 			Supponiamo che il modello di rumore $\P{\vb*{y}}{\vb*{n}}$ soddisfi le seguenti
 			due condizioni:
 			\begin{enumerate}
-				\item $\vb*{y}_t\independent\vb*{y}_s\qquad\forall\,t\ne s\in[T]\quad$ {\smaller (rumore indipendente)}
-				\item $\mathbb{E}\qty[\vb*{y}_t\mid\vb*{n}_t]=A_t\vb*{n}_t,\quad$ dove $A_t\in\R{S}{S}$ è una 
+				\item<3-> $\vb*{y}_t\independent\vb*{y}_s\qquad\forall\,t\ne s\in[T]\quad$ {\smaller (rumore indipendente)}
+				\item<4-> $\mathbb{E}\qty[\vb*{y}_t\mid\vb*{n}_t]=A_t\vb*{n}_t,\quad$ dove $A_t\in\R{S}{S}$ è una 
 				matrice \emph{invertibile} nota.
 			\end{enumerate}
-			Allora valgono le seguenti relazioni:
+			\onslide<5->{Allora valgono le seguenti relazioni:}
 			\begin{enumerate}
-				\item $\mathbb{E}\qty[\vb*{n}_t]=A_t^{-1}\cdot\mathbb{E}\qty[\vb*{y}_t]\qquad\forall\,t\in[T]$
-				\item $\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]=A_s^{-1}\cdot\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
-				\item $\Cov{\vb*{n}_s,\vb*{n}_t}=A_s^{-1}\cdot\Cov{\vb*{y}_s,\vb*{y}_t}\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
+				\item<6-> $\mathbb{E}\qty[\vb*{n}_t]=A_t^{-1}\cdot\mathbb{E}\qty[\vb*{y}_t]\qquad\forall\,t\in[T]$
+				\item<6-> $\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]=A_s^{-1}\cdot\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
+				\item<6-> $\Cov{\vb*{n}_s,\vb*{n}_t}=A_s^{-1}\cdot\Cov{\vb*{y}_s,\vb*{y}_t}\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
 			\end{enumerate}
 		\end{proposizione}
-		\begin{proof}
+		\begin{proof}<7->
 			Cfr. Appendice~\hyperlink{frame:dim_prop_noise_model:appendice}{\faHandPointRight}
 		\end{proof}
 	\end{frame}
@@ -472,14 +472,28 @@
 
 	\begin{frame}[fragile]
 		{Algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$ {\smaller (caso stazionario)}}
+		Caso {\smaller (fortemente)} stazionario: $\pi_0=\pi$.
 
 		\begin{figure}[ht]
 			\centering
-			\includegraphics[width=0.65\textwidth]{Immagini/algorithm_nonstationary.png}
+			\includegraphics[width=0.65\textwidth]{Immagini/algorithm_stationary.png}
 			%\caption{\emph{Algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$}}
 		\end{figure}
 		
 	\end{frame}
+
+	\subsection{Dimostrazione della consistenza di \texorpdfstring{$\hat{P}_{\textup{MoM}}$}{P_mom}}
+
+	\begin{frame}
+        {}
+
+        Supponiamo che:
+        \begin{enumerate}
+            \item $\pi_0=\pi$, ossia $\qty{x_t^{(m)}}_{t\in[T]}$ è \emph{fortemente} stazionario
+            \item $\P{\vb*{y}}{\vb*{n}}$ rispetti le ipotesi della proposizione~\ref{prop:noise_model}
+            \item $N\in\mathbb{N}, A\in\R{S}{S}$ siano noti {\smaller (e costanti: forte stazionarietà $\implies A_t=A\quad\forall\,t\in[T]$)}
+        \end{enumerate}
+    \end{frame}
 
 
 
@@ -510,7 +524,7 @@
 		\end{thebibliography}
 	\end{frame}
 
-
+% ----------------------------------APPENDICE----------------------------------
 
 \section*{Appendice}
 	\begin{frame}
