@@ -482,18 +482,98 @@
 		
 	\end{frame}
 
+
 	\subsection{Dimostrazione della consistenza di \texorpdfstring{$\hat{P}_{\textup{MoM}}$}{P_mom}}
 
 	\begin{frame}
-        {}
+        {\hypertarget{frame:teorema_1_part1}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 1/3$}}
 
         Supponiamo che:
         \begin{enumerate}
             \item $\pi_0=\pi$, ossia $\qty{x_t^{(m)}}_{t\in[T]}$ è \emph{fortemente} stazionario
-            \item $\P{\vb*{y}}{\vb*{n}}$ rispetti le ipotesi della proposizione~\ref{prop:noise_model}
-            \item $N\in\mathbb{N}, A\in\R{S}{S}$ siano noti {\smaller (e costanti: forte stazionarietà $\implies A_t=A\quad\forall\,t\in[T]$)}
+            \item<2-> $\P{\vb*{y}}{\vb*{n}}$ rispetti le ipotesi della proposizione~\ref{prop:noise_model}
+            \item<3-> $N\in\mathbb{N}, A\in\R{S}{S}$ siano noti {\smaller (e costanti: forte stazionarietà $\implies A_t=A\quad\forall\,t\in[T]$)}
         \end{enumerate}
+
+        \begin{teorema}<4->\label{teor:consistenza_P_mom}
+            Sia $\hat{P}_{T,K}$ lo stimatore restituito dall'algoritmo per il caso stazionario.
+
+            Nelle ipotesi precedenti, $\hat{P}_{T,K}$ è consistente.%, ossia converge in probabilità 
+            %a $P$ per $T\to\infty$ e/o $K\to\infty$.
+        \end{teorema}
+        \begin{block}<5->{Dimostrazione.}
+            \begin{itemize}
+                \item ${K\to\infty}$
+                \begin{itemize}
+                    \item<5-> Per la legge dei grandi numeri, $\lim_K\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_t]$ q.c.
+                    \onslide<6->{Dunque 
+                    $\lim_K\hat{\vb*{m}}=\lim_k\frac{1}{T}\sum_{t=1}^T\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_1]$ q.c.
+                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_mhat:appencide}{\faHandPointRight})}
+                    \item<7-> Similmente si dimostra che $\lim_K\hat{\Sigma}_{t,t+1}=\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
+                    e dunque $\hat{\Sigma}=\frac{1}{T-1}\sum_{t=1}^{T-1}\hat{\Sigma}_{t,t+1}\overset{K\to\infty}{\longrightarrow}\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
+                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_Sigmahat:appendice}{\faHandPointRight})
+                \end{itemize}
+                \onslide<8->{Ma allora $\hat{P}_{T,K}\overset{K\to\infty}{\longrightarrow}P$ in probabilità.}
+            \end{itemize}
+        \end{block}
     \end{frame}
+
+    \begin{frame}
+        {\hypertarget{frame:teorema_1_part2}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 2/3$}}
+
+        \begin{block}{}
+            \begin{itemize}
+                \item $T\to\infty$
+                
+                Possiamo supporre $K=1$. Dunque $\hat{\vb*{m}}_t=\vb*{y}_t$ e $\hat{\vb*{m}}=\frac{1}{T}\sum_{t=1}^{T}\vb*{y}_t$. \onslide<2->{Dobbiamo dimostrare che (in probabilità)
+                \begin{gather*}
+                    \hat{\vb*{m}}\xrightarrow{T\to\infty}\mathbb{E}\qty[\vb*{y}_1],\text{ e }\\
+                    \hat{\Sigma}\coloneqq\frac{1}{T-1}\sum_{t=1}^{T-1}\qty(\vb*{y}_t-\hat{\vb*{m}})\cdot\transpose{\qty(\vb*{y}_{t+1}-\hat{\vb*{m}})}\xrightarrow{T\to\infty}\Cov{\vb*{y}_1,\vb*{y}_2}
+                \end{gather*}}
+                %in probabilità.
+                \vspace{-\baselineskip}
+                
+                \hspace*{.05\linewidth}\begin{minipage}{.9\linewidth}
+                    \begin{definizione*}<3->
+                        $\qty{X_t}_{t\in[T]}$ {\smaller (fortemente stazionario)} è detto \emph{mean-ergodic} se $\frac{1}{T}\sum_{t=1}^TX_t$ converge in media seconda alla media della popolazione $\mathbb{E}\qty[X_t]$. 
+                    \end{definizione*}
+                    \begin{oss*}<4->
+                        Convergenza in media seconda $\implies$ convergenza in probabilità.
+                    \end{oss*}
+                \end{minipage}
+            \end{itemize}
+        \end{block}
+
+    \end{frame}
+
+    \begin{frame}
+        {\hypertarget{frame:teorema_1_part3}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 3/3$}}
+
+        \begin{block}{}
+            $\hat{\vb*{y}}_t$ 
+            mean-ergodic vuol dire che $\frac{1}{T}\sum_{t=1}^T\vb*{y}_t\xrightarrow{T\to\infty}\mathbb{E}\qty[\vb*{y}_1]$.
+            \onslide<2->{Similmente, $\hat{\Sigma}\xrightarrow{T\to\infty}\Cov{\vb*{y}_1,\vb*{y}_2}$ se il processo $\qty{\vb*{Z}_t}_{t\in[T-1]}$, $\vb*{Z}_t\coloneqq\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}$, è mean-ergodic.}
+
+            \onslide<3->{Per dimostrarlo, è sufficiente dimostrare che $\qty{\vb*{Z}_t(i,j)}_{t\in[T-1]}$ è 
+            mean-ergodic $\quad$ ({\smaller $\vb*{Z}_t(i,j)=\vb*{y}_{t}(i)\vb*{y}_{t+1}(j)$}).}
+            
+            \hspace{.05\linewidth}\begin{minipage}{.9\linewidth}
+                \begin{block}<4->{Proposizione {\smaller~\cite[Theorem 12.2 (p.~528)]{book:Papoulis}}}
+                    Sia $\qty{X_t}_{t\in[T]}$ stazionario e sia $\gamma_X(\tau)\coloneqq\Cov{X_{t+\tau},X_t}$ la sua funzione di autocovarianza. Se $\lim_{\tau\to\infty}\gamma_X(\tau)=0$ allora $\qty{X_t}_{t\in[T]}$ è mean-ergodic. 
+                \end{block}                
+            \end{minipage}
+            \medskip
+            
+            \begin{enumerate}
+                \item<5-> Consideriamo i processi $\qty{\vb*{n}_t}_{t\in[T]}$ e $\qty{z_t(i,j)}_{t\in[T-1]}$, $z_t(i,j)\coloneqq\vb*{n}_t(i)\vb*{n}_{t+1}(j)$ 
+                \item<6-> Si dimostra che $\gamma_{\vb*{n}}(\tau)\xrightarrow{\tau\to\infty}0$ (cfr. Appendice~\hyperlink{frame:teorema1_lim_gamma_n:appendice}{\faHandPointRight}) e che $\gamma_z(i,j)\xrightarrow{\tau\to\infty}0$
+                \item<7-> Si dimostra che $\qty{z_t(i,j)}_{t\in[T-1]}$ mean-ergodic $\implies\qty{\vb*{Z}_t(i,j)}_{t\in[T-1]}$ mean-ergodic, e che $\qty{\vb*{n}_t}_{t\in[T]}$ mean-ergodic $\implies\qty{\vb*{y}_t}_{t\in[T-1]}$ mean-ergodic.
+            \end{enumerate}
+            \hfill$\square$
+        \end{block}
+        
+    \end{frame}
+
 
 
 
@@ -521,6 +601,17 @@
 			\newblock Consistently Estimating Markov Chains with Noisy Aggregate Data
 			\newblock Proceedings of the 19th International Conference on Artificial Intelligence and Statistics, \emph{PMLR}, vol. 51, pp. 1142-1150, PMLR (2016) 09-11 May
 
+			\bibitem{book:Norris} J. R. Norris
+			\newblock Markov Chains
+			\newblock Cambridge University Press, 1997
+
+			\bibitem{book:Berger_Casella} R. L. Berger, G. Casella
+			\newblock Statistical Inference (2nd ed.)
+			\newblock Chapman and Hall/CRC, 2024
+
+			\bibitem{book:Papoulis} A. Papoulis, S. U. Pillai
+			\newblock Probability, Random Variables and Stochastic Processes (4th ed.)
+			\newblock McGraw-Hill, 2002
 		\end{thebibliography}
 	\end{frame}
 
@@ -580,9 +671,13 @@
 		$\forall\,m\in[N]$.} 
 		\onslide<5->{Di conseguenza $\vb*{n}_t$ è multinomiale di 
 		parametri $N,\vb*{\mu}_t$.}
-		\bigskip 
 
-		\textcolor{red}{Disegno}
+		%\textcolor{red}{Disegno}
+		\onslide<6->{\begin{figure}[ht]
+			\centering
+			\includegraphics[width=0.5\textwidth]{Immagini/Disegno.png}
+			%\caption{\emph{Algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$}}
+		\end{figure}}
 		
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:dettagli_nt}{\faHandPointLeft}}
 	\end{frame}
@@ -800,6 +895,74 @@
 
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_noise_model}{\faHandPointLeft}}
 	\end{frame}
+
+	\begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$K\to\infty$}{K tendente a infinito}$\qquad 1/2$}
+        {\hypertarget{frame:teorema1_lim_mhat:appencide}{Dettagli sul calcolo di \texorpdfstring{$\lim_K\hat{\vb*{m}}$}{un limite}}}
+
+        %\begin{block}{}
+        Nel calcolo di $\lim_K\hat{\vb*{m}}$ si fa uso dell'ipotesi di stazionarietà:
+        \begin{align*}
+            \lim_K\hat{\vb*{m}}&=\lim_K\frac{1}{T}\sum_{t=1}^T\hat{\vb*{m}}_t=\frac{1}{T}\sum_{t=1}\
+            \lim_K\hat{\vb*{m}}_t=\frac{1}{T}\sum_{t=1}^T\mathbb{E}\qty[\vb*{y}_t]\
+            =\frac{1}{T}\sum_{t=1}^T A_t\mathbb{E}\qty[\vb*{n}_t]\\
+        \intertext{Per ipotesi $A_t=A\quad\forall\,t\in[T]$. Dunque}
+            &=\frac{1}{T}\cdot A\cdot\sum_{t=1}^T\mathbb{E}\qty[\vb*{n}_t]=\frac{1}{T}\cdot A\cdot T\cdot\mathbb{E}\qty[\vb*{n}_1]=A\cdot\mathbb{E}\qty[\vb*{n}_1]=\mathbb{E}\qty[\vb*{y}_1]
+        %\intertext{Ma per stazionarietà $\mathbb{E}\qty[\vb*{n}_t]=\mathbb{E}\qty[\vb*{n}_1]\quad\forall\,t\in[T]$. Dunque}
+        \end{align*}
+        poiché per stazionarietà $\mathbb{E}\qty[\vb*{n}_t]=\mathbb{E}\qty[\vb*{n}_1]\quad\forall\,t\in[T]$.
+        %\end{block}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part1}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$K\to\infty$}{K tendente a infinito}$\qquad 2/2$}
+        {\hypertarget{frame:teorema1_lim_Sigmahat:appendice}{Dettagli sul calcolo di \texorpdfstring{$\lim_k\hat{\Sigma}_{t,t+1}$}{un altro limite}}}
+
+        %\begin{block}{}
+        Consideriamo 
+        \[
+            \hat{\Sigma}_{t,t+1}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}-\hat{\vb*{m}}_t)\cdot\transpose{\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{m}}_{t+1})}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}\cdot\transpose{\vb*{y}}_{t+1}^{(k)})-\hat{\vb*{m}}_t\cdot\transpose{\hat{\vb*{m}}_{t+1}}
+        \]
+        Per la legge dei grandi numeri $\hat{\vb*{m}}_t\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t]$ q.c.,
+        e $\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}\cdot\transpose{\vb*{y}}_{t+1}^{(k)}\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}]$ q.c.
+        \medskip
+
+        Dunque {\smaller (due applicazioni del teorema di Slusky~\cite[Theorem~5.5.17]{book:Berger_Casella})} $\hat{\vb*{m}}_t\cdot\transpose{\hat{\vb*{m}}}_{t+1}\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t]\cdot\mathbb{E}\qty[\transpose{\vb*{y}}_{t+1}]$ in legge. Ma il valore atteso è una costante, quindi la convergenza è in probabilità. 
+
+        Poiché la convergenza quasi certa implica quella in probabilità, si ha che 
+        \[
+            \hat{\Sigma}_{t,t+1}\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}]-\mathbb{E}\qty[\vb*{y}_t]\cdot\mathbb{E}\qty[\transpose{\vb*{y}}_{t+1}]=\Cov{\vb*{y}_1,\vb*{y}_2}
+        \]
+        in quanto per stazionarietà $\Cov{\vb*{y}_t,\vb*{y}_{t+1}}=\Cov{\vb*{y}_1,\vb*{y}_2}\quad\forall\,t\in[T]$.
+        %\end{block}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part1}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$T\to\infty$}{K tendente a infinito}}
+        {\hypertarget{frame:teorema1_lim_gamma_n:appendice}{Dimostrazione di $\lim_{\tau}\gamma_{\vb*{n}}(\tau)=0$}}
+
+        %\begin{block}{}
+        Consideriamo $\qty(\gamma_{\vb*{n}}(\tau))_i=\Cov{\vb*{n}_t(i),\vb*{n}_{t+\tau}(i)}\equiv\gamma_{\vb*{n}(i)}(\tau)$.
+        \begin{align*}
+            \gamma_{\vb*{n}(i)}(\tau)&=\operatorname{Cov}\bigg(\sum_{m=1}^N\indicator,\sum_{m'=1}^N\indicator[t+\tau][m'][i]\bigg)\\
+            %\begin{aligned}[t]
+            &=\sum_{m=m'}\Cov{\indicator,\indicator[t+\tau][m][i]}+\sum_{m\ne m'}\cancel{\Cov{\indicator,\indicator[t+\tau][m'][i]}}\\
+            %\end{aligned}\\
+            &=N\Big(\mathbb{E}\qty[\indicator\indicator[t+\tau]]-\mathbb{E}\qty[\indicator]\mathbb{E}\qty[\indicator[t+\tau]]\Big)\\
+            &=N\Big(\P{x_{t+\tau}^{m}=i,x_t^{m}=i}-\P{x_t^m=i}\P{x_{t+\tau}^m=i}\Big)\\
+            &=N\Big(\P{x_{t+\tau}^m=i}{x_t^{m}=i}\P{x_t^m=i}-\vb*{\mu}_t(i)\cdot\vb*{\mu}_{t+\tau}(i)\Big)\\
+            &=N\vb*{\mu}_t(i)\cdot\Big(P^{\tau}_{i,i}-\vb*{\mu}_{t+\tau}(i)\Big)\xrightarrow{\tau\to\infty}0
+        \end{align*}
+        in quanto per l'ergodicità $\lim_{\tau}\vb*{\mu}_{t+\tau}=\pi$ e $\lim_{\tau}P_{i,j}^{\tau}=\pi_j\quad\forall\,i,j\in[S]$.%\hfill$\square$
+        %\end{block}
+
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part3}{\faHandPointLeft}}
+    \end{frame}
 
 
 
