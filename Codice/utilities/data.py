@@ -7,13 +7,16 @@ def generate_random_P(S:int,*args,**kwargs) -> np.ndarray:
     P = generate_random_P(S,'dirichlet',precision) to use Dirichlet 
     distributions, like the authors did.
     '''
+    rng = kwargs.get('rng', np.random.default_rng(kwargs.get('seed')))
+    if rng is None:
+        rng = np.random.default_rng()
     P = np.zeros(shape=(S,S))
-    if args and (args[0] == 'dirichlet' or args[0] == 'Dirichlet'):
+    if args and args[0].lower() == 'dirichlet':
         # we parameterize the distribution like the authors did
         D = kwargs.get('precision', kwargs.get('parameter'))
-        P = np.random.dirichlet(D*np.ones(S)/S,S)
+        P = rng.dirichlet(D*np.ones(S)/S,S)
     else:
-        P = np.random.rand(S,S)
+        P = rng.rand(S,S)
         for i in range(S):
             P[i,:] = P[i,:]/P[i,:].sum()
     return P
@@ -29,36 +32,31 @@ def add_noise(n_t:np.ndarray,
         n_t (np.ndarray): K by S array of aggregated observations
         noise_type (str, optional): Type of noise to add (gaussian, poisson...). Defaults to None. If an invalid value is given, no noise will be added
 
-
     Returns:
         tuple[np.ndarray]: (y_t,A_t), i.e. noisy version of n_t and matrix of its expectation, given n_t
     """
-
+    
+    rng = kwargs.get('rng', np.random.default_rng(kwargs.get('seed')))
+    if rng is None:
+        rng = np.random.default_rng()
     (K,S) = n_t.shape
-    if noise_type == 'gaussian':
-        sigma = kwargs.get('stdev', kwargs.get('parameter'))
-        return (n_t + np.random.normal(0,sigma,size=(K,S)),np.eye(S))
-    elif noise_type == 'laplace':
-        lamda = kwargs.get('decay', kwargs.get('parameter'))
-        return (n_t + np.random.laplace(0,lamda,size=(K,S)),np.eye(S))
-    elif noise_type == 'binomial':
-        alpha = kwargs.get('alpha', kwargs.get('parameter'))
-        #if isinstance(alpha,float) or isinstance(alpha,int):
-        #    alpha *= np.ones(S)
-        return (np.random.binomial(n_t,alpha),alpha*np.eye(S))
-    elif noise_type == 'poisson':
-        lamda = kwargs.get('lambda', kwargs.get('parameter'))    
-        #if isinstance(lamda,float) or isinstance(lamda,int):
-        #    lamda *= np.ones(S)
-        return (np.random.poisson(n_t*lamda),alpha*np.eye(S))
+    noise_models = {
+        'gaussian': lambda n_t, rng, K, S, kwargs: (n_t + rng.normal(0, kwargs.get('stdev', kwargs.get('parameter')), size=(K,S)), np.eye(S)),
+        'laplace': lambda n_t, rng, K, S, kwargs: (n_t + rng.laplace(0, kwargs.get('decay', kwargs.get('parameter')), size=(K,S)), np.eye(S)),
+        'binomial': lambda n_t, rng, K, S, kwargs: (rng.binomial(n_t, kwargs.get('alpha', kwargs.get('parameter'))), kwargs.get('alpha', kwargs.get('parameter')) * np.eye(S)),
+        'poisson': lambda n_t, rng, K, S, kwargs: (rng.poisson(n_t * kwargs.get('lambda', kwargs.get('parameter'))), kwargs.get('lambda', kwargs.get('parameter')) * np.eye(S))
+    }
+
+    if noise_type in noise_models:
+        return noise_models[noise_type](n_t, rng, K, S, kwargs)
     else:
-        verbose = kwargs.get('verbose',False)
+        verbose = kwargs.get('verbose', False)
         if verbose:
             print("keywords to add noise are: 'gaussian', 'poisson',\
                 'laplace' and 'binomial'.") 
             print("No noise will be added,\
                 the original input will be returned.")
-        return (n_t,np.eye(S))
+        return (n_t, np.eye(S))
 
 
 # TODO: fix this!!
