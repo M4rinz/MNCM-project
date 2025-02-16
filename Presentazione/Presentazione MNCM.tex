@@ -2,6 +2,7 @@
 \setbeamertemplate{theorems}[numbered]%[ams style] 
 
 
+\usepackage{appendixnumberbeamer}
 \usepackage[T1]{fontenc}				% codifica dei font
 \usepackage[utf8]{inputenc}				% lettere accentate da tastiera
 \usepackage[italian]{babel}				% lingua del documento
@@ -64,7 +65,8 @@
   \mathlarger{\mathbbm{1}}\qty{\scriptstyle {x}_{#1}^{#2}=#3}%
 }
 % Define the \transpose command
-\newcommand{\transpose}[1]{\prescript{t}{}{#1}}
+%%%%%\newcommand{\transpose}[1]{\prescript{t}{}{#1}}
+\newcommand{\transpose}[1]{#1^{\top}}
 % Define the \Var command, for the variance
 \newcommand{\Var}[1]{\operatorname{Var}\qty(#1)}
 % Define the \Cov command, for the covariance
@@ -92,7 +94,7 @@
 	%COLORI
 \definecolor{madridlightblue}{RGB}{233, 233, 243}
 	
-
+\setbeamertemplate{page number in head/foot}[appendixframenumber]
 	
 % ------------------------- INIZIO CODICE -------------------------
 \usetheme{Madrid}
@@ -274,7 +276,7 @@
 		Lo stimatore dei minimi quadrati condizionati (CLS) si basa sull'idea che
 		$\vb*{n}_{t}\approx\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]$.
 		\onslide<2->{Si dimostra (cfr. Appendice~\hyperlink{frame:dettagli_val_atteso_condiz_nt:appendice}{\faHandPointRight})
-		che $\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
+		che $\mathbb{E}\qty[\transpose{\vb*{n}_t}\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
 		\smallskip
 
 		\onslide<3->{Siano 
@@ -285,24 +287,28 @@
 				%\hline
 				\vb*{n}_1 & \vb*{n}_2 & \dots & \vb*{n}_{T-1} \\
 				%\hline
-			\end{array}\right)\\
+			\end{array}\right)^{\top}\\
 			\R{(T-1)}{S}\ni Y &\coloneqq
 			\left(\begin{array}{c|c|c|c}
 				%\hline
 				\vb*{n}_2 & \vb*{n}_3 & \dots & \vb*{n}_{T} \\
 				%\hline
-			\end{array}\right)
+			\end{array}\right)^{\top}
 		\end{align*}}
 
-		\onslide<4->{L'insieme di relazioni $\vb*{n}_t\approx\transpose{\vb*{n}_{t-1}}P\quad\forall\,t\in\qty{2,\dots,T}$
+		\onslide<4->{L'insieme di relazioni $\transpose{\vb*{n}_t}\approx\transpose{\vb*{n}_{t-1}}P\quad\forall\,t\in\qty{2,\dots,T}$
 		definisce un problema ai minimi quadrati $\norm{XP-Y}_{F}^2$, di cui 
 		lo stimatore CLS è la soluzione:
 		\[
 			\hat{P}_{\textup{CLS}}\coloneqq\argmin_P\norm{XP-Y}_{F}^2=\qty(\transpose{X}X)^{-1}\transpose{X}Y
 		\]}
 
-		% C'è la questione dell'invertibilità di $\transpose{X}X$, e se 
-		% $\hat{P}_{\textup{CLS}}$ è normalizzata
+        \onslide<5->{Considerazioni (cfr. Appendice~\hyperlink{frame:proprieta_P_CLS:appendice}{\faHandPointRight}):}
+        \begin{enumerate}
+            \item<5-> \textcolor{red}{invertibilità di $\transpose{X}X$}
+            \item<6-> $\hat{P}_{\textup{CLS}}\cdot e=e$
+            \item<7-> Non è vero che $\hat{P}_{\textup{CLS}}\ge 0$, in generale.
+        \end{enumerate}
 
 	\end{frame}
 
@@ -385,16 +391,17 @@
 		%$\Var{\epsilon_t}=<\infty\quad\forall\,t\ne t'$. 
 
 		Supponiamo $\vb*{y}_t=\vb*{n}_t+\epsilon_t$, con 
-		$\mathbb{E}\qty[\epsilon_t]=0$, $\Var{\epsilon_t}<\infty\quad\forall\,t\in[T]$,
+		$\mathbb{E}\qty[\epsilon_t]=0$, $\Var{\epsilon_t}<\infty,\epsilon_t\independent\vb*{n}_t\quad\forall\,t\in[T]$,
 		e $\epsilon_t\independent\epsilon_{t'}\quad\forall\,t\ne t'$.
-		
+        \smallskip
+  
 		\onslide<2->{Si ha $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_t}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]+\Var{\epsilon_t}$,
 		e $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_{t+1}}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]$.}
 		\smallskip
 
 		\onslide<3->{Dunque con osservazioni rumorose
 		\[
-			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+V)^{-1}\hat{\Lambda}_{t,t+1}\xcancel{\xrightarrow{T\to\infty}P}
+			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+\Var{\epsilon_t})^{-1}\hat{\Lambda}_{t,t+1}\xcancel{\overset{T\to\infty}{\longrightarrow}P}
 		\]
 		ossia $\hat{P}_{\textup{CLS}}$ non è consistente con osservazioni rumorose.}
 		\smallskip
@@ -440,13 +447,13 @@
 			\begin{enumerate}
 				\item<3-> $\vb*{y}_t\independent\vb*{y}_s\qquad\forall\,t\ne s\in[T]\quad$ {\smaller (rumore indipendente)}
 				\item<4-> $\mathbb{E}\qty[\vb*{y}_t\mid\vb*{n}_t]=A_t\vb*{n}_t,\quad$ dove $A_t\in\R{S}{S}$ è una 
-				matrice \emph{invertibile} nota.
+				matrice \emph{invertibile} nota, $\forall t\in[T]$.
 			\end{enumerate}
 			\onslide<5->{Allora valgono le seguenti relazioni:}
 			\begin{enumerate}
 				\item<6-> $\mathbb{E}\qty[\vb*{n}_t]=A_t^{-1}\cdot\mathbb{E}\qty[\vb*{y}_t]\qquad\forall\,t\in[T]$
-				\item<6-> $\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]=A_s^{-1}\cdot\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
-				\item<6-> $\Cov{\vb*{n}_s,\vb*{n}_t}=A_s^{-1}\cdot\Cov{\vb*{y}_s,\vb*{y}_t}\cdot\transpose{A_t^{-1}}\qquad\forall\,s\ne t\in[T]$
+				\item<6-> $\mathbb{E}\qty[\vb*{n}_s\transpose{\vb*{n}_t}]=A_s^{-1}\cdot\mathbb{E}\qty[\vb*{y}_s\transpose{\vb*{y}_t}]\cdot{A_t^{-\top}}\qquad\forall\,s\ne t\in[T]$
+				\item<6-> $\Cov{\vb*{n}_s,\vb*{n}_t}=A_s^{-1}\cdot\Cov{\vb*{y}_s,\vb*{y}_t}\cdot{A_t^{-\top}}\qquad\forall\,s\ne t\in[T]$
 			\end{enumerate}
 		\end{proposizione}
 		\begin{proof}<7->
@@ -508,9 +515,9 @@
                     \item<5-> Per la legge dei grandi numeri, $\lim_K\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_t]$ q.c.
                     \onslide<6->{Dunque 
                     $\lim_K\hat{\vb*{m}}=\lim_k\frac{1}{T}\sum_{t=1}^T\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_1]$ q.c.
-                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_mhat:appencide}{\faHandPointRight})}
+                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_mhat:appendice}{\faHandPointRight})}
                     \item<7-> Similmente si dimostra che $\lim_K\hat{\Sigma}_{t,t+1}=\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
-                    e dunque $\hat{\Sigma}=\frac{1}{T-1}\sum_{t=1}^{T-1}\hat{\Sigma}_{t,t+1}\xrightarrow{K\to\infty}\Cov{\vb*{y}_1,\vb*{y}_2}$ in probabilità
+                    e dunque $\hat{\Sigma}=\frac{1}{T-1}\sum_{t=1}^{T-1}\hat{\Sigma}_{t,t+1}\overset{K\to\infty}{\longrightarrow}\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
                     (cfr. Appendice~\hyperlink{frame:teorema1_lim_Sigmahat:appendice}{\faHandPointRight})
                 \end{itemize}
                 \onslide<8->{Ma allora $\hat{P}_{T,K}\xrightarrow{K\to\infty}P$ in probabilità.}
@@ -550,7 +557,7 @@
         {\hypertarget{frame:teorema_1_part3}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 3/3$}}
 
         \begin{block}{}
-            $\vb*{y}_t$ 
+            ${\vb*{y}}_t$ 
             mean-ergodic vuol dire che $\frac{1}{T}\sum_{t=1}^T\vb*{y}_t\xrightarrow{T\to\infty}\mathbb{E}\qty[\vb*{y}_1]$.
             \onslide<2->{Similmente, $\hat{\Sigma}\xrightarrow{T\to\infty}\Cov{\vb*{y}_1,\vb*{y}_2}$ se il processo $\qty{\vb*{Z}_t}_{t\in[T-1]}$, $\vb*{Z}_t\coloneqq\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}$, è mean-ergodic.}
 
@@ -566,48 +573,16 @@
             
             \begin{enumerate}
                 \item<5-> Consideriamo i processi $\qty{\vb*{n}_t}_{t\in[T]}$ e $\qty{z_t(i,j)}_{t\in[T-1]}$, $z_t(i,j)\coloneqq\vb*{n}_t(i)\vb*{n}_{t+1}(j)$ 
-                \item<6-> Si dimostra che $\gamma_{\vb*{n}}(\tau)\xrightarrow{\tau\to\infty}0$ {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_lim_gamma_n:appendice}{\faHandPointRight})} e che $\gamma_z(i,j)\xrightarrow{\tau\to\infty}0$
+                \item<6-> Si dimostra che $\gamma_{\vb*{n}}(\tau)\xrightarrow{\tau\to\infty}0$ {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_lim_gamma_n:appendice}{\faHandPointRight})} e che $\gamma_{z(i,j)}(\tau)\xrightarrow{\tau\to\infty}0$
                 \item<7-> Si dimostra che $\qty{\vb*{n}_t}_{t\in[T]}$ mean-ergodic $\implies\qty{\vb*{y}_t}_{t\in[T-1]}$ mean-ergodic {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_yt_tp1_mean_ergodic:appendice}{\faHandPointRight})}
                 \item<8-> Si dimostra che $\qty{z_t(i,j)}_{t\in[T-1]}$ mean-ergodic $\implies\qty{\vb*{Z}_t(i,j)}_{t\in[T-1]}$ mean-ergodic {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_yt_mean_ergodic:appendice}{\faHandPointRight})}.\onslide<8->{\hfill$\square$}
             \end{enumerate}
-
         \end{block}
         
     \end{frame}
 
 
 
-	\section{Esperimenti numerici}
-    \begin{frame}{Rischio degli stimatori}
-        \begin{teorema}
-            Per $TK\to\infty$, gli stimatori $\hat{\vb*{m}}$ e $\hat{\Sigma}$ sono non distorti, e hanno varianza (dunque rischio quadratico) $O(1/TK)$. 
-        \end{teorema}
-        \begin{proof}<2->
-            La dimostrazione si ottiene adattando quella del teorema~\ref{teor:consistenza_P_mom} e usando~\cite[12-12 (p.~528)]{book:Papoulis}. Maggiori dettagli in~\cite{article:main}.
-        \end{proof}
-        \medskip
-
-        \onslide<3->{Un'analisi teorica del rischio di $\hat{P}_{\textup{MoM}}$ non è stata svolta in~\cite{article:main}.} 
-        
-        \onslide<4->{Gli autori hanno presentato risultati empirici che suggeriscono che anche l'errore quadratico medio di $\hat{P}_{\textup{MoM}}$ sia $O(1/TK)$.}
-    \end{frame}
-
-    \begin{frame}
-        {Esperimenti numerici}
-        {MSE vs. \texorpdfstring{$T\times K$}{TxK}, algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$ {\smaller (caso stazionario)}}
-        \begin{figure}[ht]
-			\centering
-			\includegraphics[width=\textwidth]{Immagini/mom_cls_results_authors.png}
-			%\caption{\emph{MSE per la stima di $\hat{P}_{\textup{MoM}}$}, con errore}
-		\end{figure}
-        \begin{description}
-            \item[(a)] $\vb*{y}_t(i)\mid\vb*{n}_t(i)\sim\mathrm{Binomial}\qty(\vb*{n}_t(i),\alpha),\qquad\alpha\in[0,1]$
-            \item[(b)] $\vb*{y}_t=\vb*{n}_t+\epsilon_t,\qquad\epsilon_t\sim\mathcal{N}\qty(0,\sigma^2)$
-        \end{description}
-
-        L'errore è dato da $\frac{1}{S^2}\norm*{\hat{P}-P}_F^2$.         
-        {\smaller (Per una discussione più approfondita, cfr.~\cite{article:main})}.
-    \end{frame}
 
 
 
@@ -648,6 +623,7 @@
 	\end{frame}
 
 % ----------------------------------APPENDICE----------------------------------
+\appendix
 
 \section*{Appendice}
 	\begin{frame}
@@ -678,7 +654,7 @@
 
 		\onslide<5->{Il \emph{teorema di convergenza all'equilibrio} dice che per una 
 		catena ergodica vale $\lim_{n\to\infty}\P{x_n=i}=\pi_i$. 
-		In particolare $P_{i,j}\xrightarrow{n\to\infty}\pi_j\quad\forall\,i,j\in[S]$.}
+		In particolare $P_{i,j}\overset{n}{\longrightarrow}\pi_j\quad\forall\,i,j\in[S]$.}
 
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:intro}{\faHandPointLeft}}
 	\end{frame}
@@ -735,11 +711,35 @@
 			\mathbb{E}\qty[\vb*{n}_t(j)\mid\vb*{n}_{t-1}]&=\sum_{i=1}^S \mathbb{E}\qty[T_{i,j}^{(t-1)}\mid\vb*{n}_{t-1}]=\sum_{i=1}^{S}\mathbb{E}\qty[T_{i,j}^{(t-1)}\mid\vb*{n}_{t-1}(i)]\\
 			&=\sum_{i=1}^{S}\vb*{n}_{t-1}(i)P_{i,j}=\qty(\transpose{\vb*{n}_{t-1}}P)_j
 		\end{align*}
-		Ovvero $\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
+		Ovvero $\mathbb{E}\qty[\transpose{\vb*{n}_t}\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
 
 
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
 	\end{frame}
+
+    \begin{frame}
+        {\hypertarget{frame:proprieta_P_CLS:appendice}{Proprietà di $\hat{P}_{\textup{CLS}}$}}
+
+        \begin{enumerate}
+            \item Si suppone che $T\gg S$, dunque $\transpose{X}X$ è invertibile $\iff\rank{X}=S$. 
+            \[
+                X=\sum_{m=1}^N
+                 \left(\begin{array}{c|c|c}
+				    V_1^{(m)} & \dots & V_{T-1}^{(m)} \\  
+                \end{array}\right)^{\top}
+                \equiv\sum_{m=1}^N\mathcal{V}^{(m)}, \quad\mathcal{V}^{(m)}\in\qty{0,1}^{(T-1)\times S}
+            \]
+            \textbf{Idea}: $P$ è ergodica, quindi se $T$ è grande abbastanza, qualsiasi stato è visitato. Se qualsiasi stato fosse visitato, $\mathcal{V}^{(m)}$ avrebbe $e_1,\dots,e_S$ tra le sue righe; dunque si avrebbe $\rank\mathcal{V}^{(m)}=S\quad\forall m\in[N]$
+            \item Osserviamo che $X e=Y e=N\cdot e$. Dunque
+            \[
+                \hat{P}_{\textup{CLS}} e=e\iff \transpose{X}Ye=\transpose{X}Xe\iff N\cdot\transpose{X}e=N\cdot\transpose{X}e
+            \]
+            \item Siano $X\coloneqq\mqty(5 & 5 \\ 9 & 1), Y\coloneqq\mqty(9 & 1\\1 & 9)$. 
+            Si ottiene $\hat{P}_{\textup{CLS}}=\frac{1}{10}\mqty(-1 & 11 \\ 19 & -9)\not\ge 0$.
+        \end{enumerate}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
+    \end{frame}
 
 	\begin{frame}
 		{\hypertarget{frame:dim_prop_1:appendice}{Dimostrazione della Proposizione~\ref{prop:formule_momenti}$\qquad$ 1/4}}
@@ -928,9 +928,9 @@
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_noise_model}{\faHandPointLeft}}
 	\end{frame}
 
-    \begin{frame}
+	\begin{frame}
         {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$K\to\infty$}{K tendente a infinito}$\qquad 1/2$}
-        {\hypertarget{frame:teorema1_lim_mhat:appencide}{Dettagli sul calcolo di \texorpdfstring{$\lim_K\hat{\vb*{m}}$}{un limite}}}
+        {\hypertarget{frame:teorema1_lim_mhat:appendice}{Dettagli sul calcolo di \texorpdfstring{$\lim_K\hat{\vb*{m}}$}{un limite}}}
 
         %\begin{block}{}
         Nel calcolo di $\lim_K\hat{\vb*{m}}$ si fa uso dell'ipotesi di stazionarietà:
@@ -955,10 +955,10 @@
         %\begin{block}{}
         Consideriamo 
         \[
-            \hat{\Sigma}_{t,t+1}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}-\hat{\vb*{m}}_t)\cdot\transpose{\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{m}}_{t+1})}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}\cdot\transpose{\vb*{y}}_{t+1}^{(k)})-\hat{\vb*{m}}_t\cdot\transpose{\hat{\vb*{m}}_{t+1}}
+            \hat{\Sigma}_{t,t+1}=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}-\hat{\vb*{m}}_t)\cdot\transpose{{\qty(\vb*{y}_{t+1}^{(k)}-\hat{\vb*{m}}_{t+1})}}\kern-0.5em=\frac{1}{K}\sum_{k=1}^{K}\qty(\vb*{y}_t^{(k)}\cdot\transpose{{\vb*{y}_{t+1}^{(k)}}})-\hat{\vb*{m}}_t\cdot\transpose{\hat{\vb*{m}}_{t+1}}
         \]
         Per la legge dei grandi numeri $\hat{\vb*{m}}_t\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t]$ q.c.,
-        e $\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}\cdot\transpose{\vb*{y}}_{t+1}^{(k)}\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}]$ q.c.
+        e $\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}\cdot\transpose{{\vb*{y}_{t+1}^{(k)}}}\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}]$ q.c.
         \medskip
 
         Dunque {\smaller (due applicazioni del teorema di Slusky~\cite[Theorem~5.5.17]{book:Berger_Casella})} $\hat{\vb*{m}}_t\cdot\transpose{\hat{\vb*{m}}}_{t+1}\xrightarrow{K\to\infty}\mathbb{E}\qty[\vb*{y}_t]\cdot\mathbb{E}\qty[\transpose{\vb*{y}}_{t+1}]$ in legge. Ma il valore atteso è una costante, quindi la convergenza è in probabilità. 
@@ -1044,4 +1044,3 @@
 
 
 \end{document}
-

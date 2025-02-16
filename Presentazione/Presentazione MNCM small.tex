@@ -1,6 +1,6 @@
 \documentclass[10pt,xcolor={table,dvipsnames}]{beamer} 		% carica automaticamente amsthm, amssymb, amsmath, graphicx
 \setbeamertemplate{theorems}[numbered]%[ams style] 
-
+\setbeamertemplate{bibliography item}{\insertbiblabel}
 
 \usepackage[T1]{fontenc}				% codifica dei font
 \usepackage[utf8]{inputenc}				% lettere accentate da tastiera
@@ -158,7 +158,7 @@
                     e dunque $\hat{\Sigma}=\frac{1}{T-1}\sum_{t=1}^{T-1}\hat{\Sigma}_{t,t+1}\overset{K\to\infty}{\longrightarrow}\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
                     (cfr. Appendice~\hyperlink{frame:teorema1_lim_Sigmahat:appendice}{\faHandPointRight})
                 \end{itemize}
-                \onslide<8->{Ma allora $\hat{P}_{T,K}\overset{K\to\infty}{\longrightarrow}P$ in probabilità.}
+                \onslide<8->{Ma allora $\hat{P}_{T,K}\xrightarrow{K\to\infty}P$ in probabilità.}
             \end{itemize}
         \end{block}
     \end{frame}
@@ -195,7 +195,7 @@
         {\hypertarget{frame:teorema_1_part3}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 3/3$}}
 
         \begin{block}{}
-            $\hat{\vb*{y}}_t$ 
+            ${\vb*{y}}_t$ 
             mean-ergodic vuol dire che $\frac{1}{T}\sum_{t=1}^T\vb*{y}_t\xrightarrow{T\to\infty}\mathbb{E}\qty[\vb*{y}_1]$.
             \onslide<2->{Similmente, $\hat{\Sigma}\xrightarrow{T\to\infty}\Cov{\vb*{y}_1,\vb*{y}_2}$ se il processo $\qty{\vb*{Z}_t}_{t\in[T-1]}$, $\vb*{Z}_t\coloneqq\vb*{y}_t\cdot\transpose{\vb*{y}_{t+1}}$, è mean-ergodic.}
 
@@ -211,34 +211,49 @@
             
             \begin{enumerate}
                 \item<5-> Consideriamo i processi $\qty{\vb*{n}_t}_{t\in[T]}$ e $\qty{z_t(i,j)}_{t\in[T-1]}$, $z_t(i,j)\coloneqq\vb*{n}_t(i)\vb*{n}_{t+1}(j)$ 
-                \item<6-> Si dimostra che $\gamma_{\vb*{n}}(\tau)\xrightarrow{\tau\to\infty}0$ (cfr. Appendice~\hyperlink{frame:teorema1_lim_gamma_n:appendice}{\faHandPointRight}) e che $\gamma_z(i,j)\xrightarrow{\tau\to\infty}0$
-                \item<7-> Si dimostra che $\qty{z_t(i,j)}_{t\in[T-1]}$ mean-ergodic $\implies\qty{\vb*{Z}_t(i,j)}_{t\in[T-1]}$ mean-ergodic, e che $\qty{\vb*{n}_t}_{t\in[T]}$ mean-ergodic $\implies\qty{\vb*{y}_t}_{t\in[T-1]}$ mean-ergodic.
+                \item<6-> Si dimostra che $\gamma_{\vb*{n}}(\tau)\xrightarrow{\tau\to\infty}0$ {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_lim_gamma_n:appendice}{\faHandPointRight})} e che $\gamma_z(i,j)\xrightarrow{\tau\to\infty}0$
+                \item<7-> Si dimostra che $\qty{\vb*{n}_t}_{t\in[T]}$ mean-ergodic $\implies\qty{\vb*{y}_t}_{t\in[T-1]}$ mean-ergodic {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_yt_tp1_mean_ergodic:appendice}{\faHandPointRight})}
+                \item<8-> Si dimostra che $\qty{z_t(i,j)}_{t\in[T-1]}$ mean-ergodic $\implies\qty{\vb*{Z}_t(i,j)}_{t\in[T-1]}$ mean-ergodic {\smaller (cfr. Appendice~\hyperlink{frame:teorema1_yt_mean_ergodic:appendice}{\faHandPointRight})}.\onslide<8->{\hfill$\square$}
             \end{enumerate}
-            \hfill$\square$
         \end{block}
         
     \end{frame}
 
-    %\begin{frame}
-    %    {Convergenza}
-    %
-    %    
-    %\end{frame}
 
+  
+\section{Esperimenti numerici}
+    \begin{frame}{Rischio degli stimatori}
+        \begin{teorema}
+            Per $TK\to\infty$, gli stimatori $\hat{\vb*{m}}$ e $\hat{\Sigma}$ sono non distorti, e hanno varianza (dunque rischio quadratico) $O(1/TK)$. 
+        \end{teorema}
+        \begin{proof}<2->
+            La dimostrazione si ottiene adattando quella del teorema~\ref{teor:consistenza_P_mom} e usando~\cite[12-12 (p.~528)]{book:Papoulis}. Maggiori dettagli in~\cite{article:main}.
+        \end{proof}
+        \medskip
 
+        \onslide<3->{Un'analisi teorica del rischio di $\hat{P}_{\textup{MoM}}$ non è stata svolta in~\cite{article:main}.} 
+        
+        \onslide<4->{Gli autori hanno presentato risultati empirici che suggeriscono che anche l'errore quadratico medio di $\hat{P}_{\textup{MoM}}$ sia $O(1/TK)$.}
+    \end{frame}
 
+    \begin{frame}
+        {Esperimenti numerici}
+        {MSE vs. \texorpdfstring{$T\times K$}{TxK}, algoritmo per il calcolo di $\hat{P}_{\textup{MoM}}$ {\smaller (caso stazionario)}}
+        \begin{figure}[ht]
+			\centering
+			\includegraphics[width=\textwidth]{Immagini/mom_cls_results_authors.png}
+			%\caption{\emph{MSE per la stima di $\hat{P}_{\textup{MoM}}$}, con errore}
+		\end{figure}
+        \begin{description}
+            \item[(a)] $\vb*{y}_t(i)\mid\vb*{n}_t(i)\sim\mathrm{Binomial}\qty(\vb*{n}_t(i),\alpha)\quad\alpha\in[0,1]$
+            \item[(b)] $\vb*{y}_t=\vb*{n}_t+\epsilon_t\quad\epsilon_t\sim\mathcal{N}\qty(0,\sigma^2)$
+        \end{description}
 
+        L'errore è dato da $\frac{1}{S^2}\norm*{\hat{P}-P}_F^2$.         
+        {\smaller (Per una discussione più approfondita, cfr.~\cite{article:main})}.
+    \end{frame}
 
-
-
-
-
-
-
-
-
-
-
+    
 
 	\begin{frame}{\refname}
 		\begin{thebibliography}{9}
@@ -322,7 +337,7 @@
     \end{frame}
 
     \begin{frame}
-        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$T\to\infty$}{K tendente a infinito}}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$T\to\infty$}{T tendente a infinito}$\qquad 1/3$}
         {\hypertarget{frame:teorema1_lim_gamma_n:appendice}{Dimostrazione di $\lim_{\tau}\gamma_{\vb*{n}}(\tau)=0$}}
 
         %\begin{block}{}
@@ -343,6 +358,52 @@
 
         \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part3}{\faHandPointLeft}}
     \end{frame}
+
+    \begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$T\to\infty$}{T tendente a infinito}$\qquad 2/3$}
+        {\hypertarget{frame:teorema1_yt_mean_ergodic:appendice}{Se \texorpdfstring{$\qty{\vb*{n}_t}_{t\in[T]}$}{n_t} è mean-ergodic, allora \texorpdfstring{$\qty{\vb*{y}_t}_{t\in[T]}$}{y_t} lo è}}
+
+        \begin{itemize}
+            \item Per la proposizione~\ref{prop:noise_model} si ha 
+            \[
+                \gamma_{\vb*{y}}(\tau)=\Cov{\vb*{y}_t,\vb*{y}_{t+\tau}}=A_t\cdot\qty(\Cov{\vb*{n}_t,\vb*{n}_{t+\tau}})\cdot\transpose{A}_{t+\tau}=A_t\cdot\gamma_{\vb*{n}}(\tau)\cdot\transpose{A}_{t+\tau}
+            \]
+            dunque $\lim_{\tau\to\infty}\gamma_{\vb*{n}}(\tau)=0\implies\lim_{\tau\to\infty}\gamma_{\vb*{y}}(\tau)=0$.
+            \item Tramite la proposizione~\ref{prop:noise_model} si dimostra che 
+            \[
+                \Cov{\vb*{y}_s\cdot\transpose{\vb*{y}}_t,\vb*{y}_u\cdot\transpose{\vb*{y}}_v}=A_s\cdot\Cov{\vb*{n}_s\cdot\transpose{\qty(A_t\vb*{n}_t)},\qty(A_u\vb*{n}_u)\cdot\transpose{\vb*{n}}_v}\cdot\transpose{A}_v
+            \]
+            Inoltre per $\Cov{\vb*{n}_s\cdot\transpose{\qty(A_t\vb*{n}_t)},\qty(A_u\vb*{n}_u)\cdot\transpose{\vb*{n}}_v}_{i,j}$ si ha
+            \begin{gather*}
+                \operatorname{Cov}\Big(\vb*{n}_s(i)\cdot (A_t\vb*{n}_t)(j),\,(A_u\vb*{n}_u)(i)\cdot\vb*{n}_v(j)\Big)=\\
+                \operatorname{Cov}\Big(\vb*{n}_s(i)\cdot\sum_{k}A_t(j,k)\vb*{n}_t(k),\,\vb*{n}_v(j)\cdot\sum_{k'}A_u(i,k')\vb*{n}_u(k')\Big)=\\
+                \sum_{k,k'}A_t(j,k)\cdot A_u(i,k')\cdot\operatorname{Cov}\Big(\vb*{n}_s(i)\vb*{n}_t(k),\,\vb*{n}_u(k')\vb*{n}_v(j)\Big)
+            \end{gather*}
+            %\textbf{\textcolor{red}{Finire}}
+        \end{itemize}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part3}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$T\to\infty$}{T tendente a infinito}$\qquad 3/3$}
+        {\hypertarget{frame:teorema1_yt_tp1_mean_ergodic:appendice}{Se \texorpdfstring{$\qty{\vb*{n}_t\cdot\transpose{\vb*{n}}_{t+1}}_{t\in[T]}$}{n_t n_{t+1}} è mean-ergodic, allora \texorpdfstring{$\qty{\vb*{y}_t\cdot\transpose{\vb*{y}}_{t+1}}_{t\in[T]}$}{y_t y_{t+1}} lo è}}
+        
+        Il caso che ci interessa è con gli istanti temporali $t\leftarrow t+1$, $s\leftarrow t$, $u\leftarrow t+\tau$, $v\leftarrow t+1+\tau$.
+        \smallskip
+
+        Modificando gli indici nella dimostrazione fornita nel materiale supplementare di~\cite{article:main}, si dimostra che 
+        \[
+            \lim_{\tau\to\infty}\operatorname{Cov}\Big(\vb*{n}_{t}(i)\vb*{n}_{t+1}(k),\vb*{n}_{t+\tau}(k')\vb*{n}_{t+1+\tau}(j)\Big)=0\qquad\forall\,k,k'\in[S].
+        \]
+
+        Dunque $\Cov{\vb*{n}_s\cdot\transpose{\qty(A_t\vb*{n}_t)},\qty(A_u\vb*{n}_u)\cdot\transpose{\vb*{n}}_v}_{i,j}\xrightarrow{\tau\to\infty}0\quad\forall\,i,j\in[S]$, 
+        da cui segue che $\lim_{\tau\to\infty}\gamma_{\vb*{Z}}(\tau)=0$, ovvero $\qty{\vb*{y}_t\cdot\transpose{\vb*{y}}_{t+1}}_{t\in[T-1]}$ è mean-ergodic.
+
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:teorema_1_part3}{\faHandPointLeft}}
+    \end{frame}
+
 
 
 
