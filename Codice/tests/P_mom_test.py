@@ -32,7 +32,7 @@ K = 20
 N = 100
 
 # Change here to change the variance
-variance = 0
+variance = 1
 
 n_t_array, y_t_array, A = create_observations(T=T, K=K, N=N, 
 											  pi_0=pi, stationary=True,
@@ -67,7 +67,8 @@ m_t_hat = np.linalg.solve(A,m_t_hat)
 mu_hat = np.linalg.solve(A,pi)
 mu_hat = mu_hat/np.linalg.norm(mu_hat,1)	# pleonastic
 
-deviations = y_t_array - N*mu_hat #change to mu_hat?
+deviations = y_t_array - N*mu_hat
+deviations = y_t_array - m_t_hat 
 
 Sigma_hat = np.matmul(deviations[:-1].transpose(0,2,1),deviations[1:]).mean(axis=0)/K
 Sigma_hat = np.linalg.solve(A,Sigma_hat)
