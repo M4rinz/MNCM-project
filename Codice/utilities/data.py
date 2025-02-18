@@ -16,7 +16,7 @@ def generate_random_P(S:int,*args,**kwargs) -> np.ndarray:
         D = kwargs.get('precision', kwargs.get('parameter'))
         P = rng.dirichlet(D*np.ones(S)/S,S)
     else:
-        P = rng.rand(S,S)
+        P = rng.random(size=(S,S))
         for i in range(S):
             P[i,:] = P[i,:]/P[i,:].sum()
     return P

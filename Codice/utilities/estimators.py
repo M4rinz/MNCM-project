@@ -35,8 +35,8 @@ def P_mom_nonstationary(
     m_t_hat = np.linalg.solve(A_t,m_t_hat)
     m_tp1_hat = np.linalg.solve(A_tp1,m_tp1_hat)
     # Normalize
-    mu_t_hat = m_t_hat/m_t_hat.sum()
-    mu_tp1_hat = m_tp1_hat/m_tp1_hat.sum()
+    mu_t_hat = m_t_hat/np.linalg.norm(m_t_hat,1)
+    mu_tp1_hat = m_tp1_hat/np.linalg.norm(m_tp1_hat,1)
 
     # Estimate time-lagged covariance of true counts
     #Sigma_t_tp1_hat = sum((np.outer(y_t-mu_hat, y_t-mu_hat) for y_t in y_t_array))
@@ -69,7 +69,9 @@ def P_mom_stationary(
         N (int): number of individuals in the population
 
     Returns:
-        np.ndarray: the estimation of the transition matrix
+        P_mom (np.ndarray): the estimation of the transition matrix
+        mu_hat (np.ndarray): the estimation of the mean of the true counts
+        Sigma_hat (np.ndarray): the estimation of the time-lagged covariance of the true counts
     """
     _, K, _ = y_array.shape
 
@@ -84,7 +86,7 @@ def P_mom_stationary(
     m_t_hat = np.linalg.solve(A,m_t_hat)
 
     # Normalize
-    mu_hat = m_t_hat/m_t_hat.sum()
+    mu_hat = m_t_hat/np.linalg.norm(m_t_hat,1)
 
     # estimate time-lagged covariance of noisy counts
     deviations = y_array - m_t_hat
@@ -96,7 +98,7 @@ def P_mom_stationary(
     # Estimate transition matrix
     P_mom = ((Sigma_hat/N+np.outer(mu_hat,mu_hat)).T/mu_hat).T
 
-    return P_mom
+    return P_mom, mu_hat, Sigma_hat
 
 
 
