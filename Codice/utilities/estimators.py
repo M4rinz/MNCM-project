@@ -1,4 +1,5 @@
 import numpy as np
+#from itertools import product
 
 
 # ################################# COMPUTATION OF P_MOM #################################   
@@ -75,21 +76,25 @@ def P_mom_stationary(
     """
     _, K, _ = y_array.shape
 
-    #sanity_checks_stationary(K,N,S,)
-
     # estimate mean of noisy data
     # (aka compute empirical expectations along T and K)
-    m_t_hat = y_array.mean(axis=(0,1))
+    m_hat = y_array.mean(axis=(0,1))
 
     # estimate mean of true counts
     # (aka multiply by A^-1, as of proposition 3)
-    m_t_hat = np.linalg.solve(A,m_t_hat)
+    m_hat = np.linalg.solve(A,m_hat)
+
+    #if np.min(m_hat) < 0:
+    #    raise Exception("There are negative elements in m_hat")
 
     # Normalize
-    mu_hat = m_t_hat/np.linalg.norm(m_t_hat,1)
+    mu_hat = m_hat/np.linalg.norm(m_hat,1)
+
+    if not np.isclose(np.linalg.norm(mu_hat,1),1):
+        raise Exception("mu_hat is not correctly normalized")
 
     # estimate time-lagged covariance of noisy counts
-    deviations = y_array - m_t_hat
+    deviations = y_array - m_hat  # broadcasting
     Sigma_hat = np.matmul(deviations[:-1].transpose(0,2,1),deviations[1:]).mean(axis=0)/K
     # estimate time-lagged covariance of true counts
     Sigma_hat = np.linalg.solve(A,Sigma_hat)

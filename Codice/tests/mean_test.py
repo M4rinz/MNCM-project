@@ -1,3 +1,8 @@
+"""The purpose of this test is to check to which degree the empirical mean 
+of the original data (over the temporal and repetitions dimension) approximate the
+true expectation of the original data (given by steady-state vector)
+"""
+
 import os
 import sys
 
@@ -25,8 +30,10 @@ K = 1	# n° of total repetitions
 N = 100
 
 n_t_array, y_t_array, A = create_observations(T=T, K=K, N=N, 
-											  pi_0=pi, stationary=True,
+											  P=P, pi_0=pi, 
+											  stationary=True,
 											  noise_type='gaussian', stdev=1, seed=SEED)
+assert n_t_array.shape == (T,K,S), f"Error: n_t_array.shape = {n_t_array.shape} instead of ({T},{K},{S})"
 print(f"n_t_array.shape = {n_t_array.shape}.\t (T,K,S) = ({T}, {K}, {S})")
 print()
 
