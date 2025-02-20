@@ -1,6 +1,7 @@
 import numpy as np
 #from typing import Iterable
 from itertools import product
+import os
 
 def generate_random_P(S:int,*args,**kwargs) -> np.ndarray:
     '''
@@ -127,7 +128,7 @@ def create_observations_dummy(T:int, K:int, N:int,
     # Therefore A_t is the same for all timesteps 
     return (np.array(n_t_vector), np.array(y_t_vector), A_t)    
 
-
+@np.errstate(divide='raise')    # Divisions by 0 are raised as FloatingPointError (to whoever catches first of course)
 def create_observations(T:int, K:int, N:int,
                         P:np.ndarray,
                         pi_0:np.ndarray,
@@ -190,3 +191,31 @@ def create_observations(T:int, K:int, N:int,
     # Thus, even though we've gathered all matrices so far, we only return the first :)
 
     return n_t_vector, y_t_vector, A_t_vector[0,:,:] 
+
+def return_filename(noisy:bool,
+                    T:int,
+                    K:int,
+                    S:int,
+                    N:int,
+                    noise_type:str,
+                    parameter:float) -> str:
+    # Whether we're saving noisy or true counts
+    filename = "y_t_arr__" if noisy else "n_t_arr__"
+    # Save parameters configuration in the filename
+    filename += f"T={T}_K={K}_S={S}_N={N}__"
+    # Save noise type and parameter
+    filename += f"noise_type={noise_type}_parameter={parameter}"
+
+def save_observation(array:np.ndarray,
+                     filename:str,
+                     path:str) -> None:
+    full_path = os.path.join(path, filename)
+    with open(full_path, 'wb') as file:
+        np.save(file, array)
+        
+def load_observation(filename:str,
+                     path:str) -> np.ndarray:
+    full_path = os.path.join(path, filename)
+    with open(full_path, 'rb') as file:
+        arr = np.load(file)
+    return arr

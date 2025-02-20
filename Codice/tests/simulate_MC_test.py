@@ -6,10 +6,8 @@ This test is needed to try out the simulation method of the Markov Chain
 import os
 import sys
 
-# Launch this script from within the test/ folder!
-sys.path.append(os.path.abspath(os.path.join('..')))
 
-from utilities.data import add_noise, generate_random_P, create_observations
+from utilities.data import generate_random_P
 from utilities.num_methods import compute_stationary_LU_GTH
 
 import numpy as np
