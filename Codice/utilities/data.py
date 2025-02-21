@@ -128,7 +128,7 @@ def create_observations_dummy(T:int, K:int, N:int,
     # Therefore A_t is the same for all timesteps 
     return (np.array(n_t_vector), np.array(y_t_vector), A_t)    
 
-@np.errstate(divide='raise')    # Divisions by 0 are raised as FloatingPointError (to whoever catches first of course)
+
 def create_observations(T:int, K:int, N:int,
                         P:np.ndarray,
                         pi_0:np.ndarray,

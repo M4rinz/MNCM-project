@@ -55,7 +55,9 @@ def P_mom_nonstationary(
 
     return P_mom_t
 
-
+# Divisions by 0 are returned as warning: RuntimeWarning: invalid value encountered in divide
+# (to whoever catches first of course)
+@np.errstate(divide='warn')
 def P_mom_stationary(
         y_array:np.ndarray,
         A:np.ndarray,
@@ -134,4 +136,4 @@ def P_cls_stationary(y_array:np.ndarray,
     coll_P_cls = np.array([np.linalg.lstsq(X[k], Y[k],rcond=rcond)[0] for k in range(K)])
     P_cls = coll_P_cls.mean(axis=0)
 
-    return P_cls         
+    return P_cls

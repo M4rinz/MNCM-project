@@ -8,8 +8,7 @@ import sys
 # Launch this script from within the test/ folder!
 sys.path.append(os.path.abspath(os.path.join('..')))
 
-from utilities.estimators import P_mom_stationary
-from utilities.data import generate_random_P, create_observations, load_observation, return_subdir_name, save_observation, return_filename
+from utilities.data import generate_random_P, create_observations, return_subdir_name, save_observation
 from utilities.num_methods import compute_stationary_LU_GTH
 
 import numpy as np
@@ -78,7 +77,7 @@ for T, K, i, noise_type in tqdm(prod):
 								  parameter=parameter)
 	# Create the path of the subdirectory in which the arrays corresponding to
 	# the given configurations of parameters have to be stored
-	subdir_path = os.path.join(PATH,subdir_name)
+	subdir_path = os.path.join(PATH,'observations',subdir_name)
 
 	# Invariant: the noisy and original observations are either both present
 	# or not present
@@ -92,28 +91,32 @@ for T, K, i, noise_type in tqdm(prod):
 			# Create name of the file in which to save the arrays
 			n_filename = f"n_t_arr__repetition={rep}"
 			y_filename = f"y_t_arr__repetition={rep}"
+			par_name_val = "stdev" if noise_type=='gaussian' else 'alpha'
+			A_filename = f"A_noise_type={noise_type}_{par_name_val}={parameter}"
 		
-			n_t_array, y_t_array, A_gauss = create_observations(
-															T=T, K=K, N=N,
-															P=P, pi_0=pi,
-															noise_type=noise_type, 
-															parameter=parameter
+			n_t_array, y_t_array, A = create_observations(
+														T=T, K=K, N=N,
+														P=P, pi_0=pi,
+														noise_type=noise_type, 
+														parameter=parameter
 														)
 			if VERBOSE:
 				print(f"... and save it in {subdir_path}")
 
 			save_observation(array=n_t_array,
 							filename = n_filename,
-							path=subdir_path
-							)
+							path=subdir_path)
 			
 			save_observation(array=y_t_array,
 							filename = y_filename,
-							path=subdir_path
-							)
+							path=subdir_path)
+			
+			save_observation(array=A,
+							filename=A_filename,
+							path=subdir_path)
 	else:
 		num_files = len(os.listdir(subdir_path))
-		assert num_files == 2*n_reps, f"Error: in {subdir_name} there are {num_files} files, there should be 2*n_reps = {2*n_reps}"
+		assert num_files == 2*n_reps+1, f"Error: in {subdir_name} there are {num_files} files, there should be 2*n_reps +1 = {2*n_reps+1}"
 		if VERBOSE:
 			print(f"The folder {subdir_path} already exists and is not empty, let's just load the data")
 			print(f"n_reps = {n_reps}. There are {num_files} files in the directory {subdir_name}")
