@@ -8,7 +8,8 @@ import sys
 # Launch this script from within the test/ folder!
 sys.path.append(os.path.abspath(os.path.join('..')))
 
-from utilities.data import generate_random_P, create_observations, load_observation, save_observation, return_filename
+from utilities.estimators import P_mom_stationary
+from utilities.data import generate_random_P, create_observations, load_observation, return_subdir_name, save_observation, return_filename
 from utilities.num_methods import compute_stationary_LU_GTH
 
 import numpy as np
@@ -31,7 +32,7 @@ T_range = [10**k for k in range(1,3)]
 K_range = [1, 5, 20]
 N = 100
 
-n_reps = 100
+n_reps = 10
 
 P = generate_random_P(S, seed=SEED)
 pi = compute_stationary_LU_GTH(P)
@@ -57,44 +58,72 @@ with open(os.path.join(PATH,'pi.npy'), 'wb') as file:
 #sys.exit(0)	# stop here
 #print("Non arrivare qui!")
 
-prod = product(T_range, K_range, range(0,len(alpha)))
-for T, K, i in tqdm(prod):
-	# Create the filename according to a standard
-	n_filename = return_filename(noisy=False,
-							  	T=T, K=K, S=S, N=N,
-							  	noise_type='gaussian',
-							  	parameter=np.sqrt(variance[i])
-							  	)
-	y_filename = return_filename(noisy=True,
-							  T=T, K=K, S=S, N=N,
-							  noise_type='gaussian',
-							  parameter=np.sqrt(variance[i]))
+prod = product(T_range, K_range, range(0,len(alpha)), ['gaussian','binomial'])
+for T, K, i, noise_type in tqdm(prod):
+	# Get parameter, distinguishing the two cases
+	parameter = np.sqrt(variance[i]) if noise_type=='gaussian' else alpha[i]
+	## Create a dictionary to store the data, with parameters value
+	#dict_entry = {
+	#	'noise_type': noise_type,
+	#	'TxK': T*K,
+	#}
+	#if noise_type == 'gaussian':
+	#	dict_entry['stdev'] = parameter[i]
+	#else:
+	#	dict_entry['alpha'] = parameter[i]
 	
-	# For the original observations
-	if os.path.exists(os.path.join(PATH, n_filename)):
+	# Create subdirectory name according to a standard
+	subdir_name = return_subdir_name(T=T, K=K, S=S, N=N,
+								  noise_type=noise_type,
+								  parameter=parameter)
+	# Create the path of the subdirectory in which the arrays corresponding to
+	# the given configurations of parameters have to be stored
+	subdir_path = os.path.join(PATH,subdir_name)
+
+	# Invariant: the noisy and original observations are either both present
+	# or not present
+	if not os.path.exists(subdir_path) or not os.listdir(subdir_path):
 		if VERBOSE:
-			print("The file already exists, let's just load it")
-		n_t_array_gauss = load_observation(filename=n_filename, path=PATH)
-	else:
-		if VERBOSE:
-			print("The file doesn't exist, I'll create it...")
-		n_t_array_gauss, y_t_array_gauss, A_gauss = create_observations(
-														T=T, K=K, N=N,
-														P=P, pi_0=pi,
-														noise_type='gaussian', 
-														stdev=np.sqrt(variance[i]) 
-													)
-		if VERBOSE:
-			print(f"... and save it in {PATH}")
-		save_observation(array=n_t_array_gauss,
-						filename = n_filename,
-						path=PATH
-						)
+			print(f"The folder {subdir_path} doesn't exist or it exists but is empty, I'll create it and generate the data...")
+		os.makedirs(subdir_path, exist_ok=True)
+
+		# Create the n_reps observations to fill the folder right away
+		for rep in range(n_reps):
+			# Create name of the file in which to save the arrays
+			n_filename = f"n_t_arr__repetition={rep}"
+			y_filename = f"y_t_arr__repetition={rep}"
 		
-		save_observation(array=y_t_array_gauss,
-						filename = y_filename,
-						path=PATH
-						)
+			n_t_array, y_t_array, A_gauss = create_observations(
+															T=T, K=K, N=N,
+															P=P, pi_0=pi,
+															noise_type=noise_type, 
+															parameter=parameter
+														)
+			if VERBOSE:
+				print(f"... and save it in {subdir_path}")
+
+			save_observation(array=n_t_array,
+							filename = n_filename,
+							path=subdir_path
+							)
+			
+			save_observation(array=y_t_array,
+							filename = y_filename,
+							path=subdir_path
+							)
+	else:
+		num_files = len(os.listdir(subdir_path))
+		assert num_files == 2*n_reps, f"Error: in {subdir_name} there are {num_files} files, there should be 2*n_reps = {2*n_reps}"
+		if VERBOSE:
+			print(f"The folder {subdir_path} already exists and is not empty, let's just load the data")
+			print(f"n_reps = {n_reps}. There are {num_files} files in the directory {subdir_name}")
+		
+		# We're just testing the creation, no point in loading
+		#n_t_array = load_observation(filename=n_filename, path=subdir_path)
+		#y_t_array = load_observation(filename=y_filename, path=subdir_path)
+		
+	## method of moments estimator
+	#P_mom, _, _ = P_mom_stationary
 	
 
 	

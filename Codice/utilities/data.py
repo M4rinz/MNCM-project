@@ -201,10 +201,27 @@ def return_filename(noisy:bool,
                     parameter:float) -> str:
     # Whether we're saving noisy or true counts
     filename = "y_t_arr__" if noisy else "n_t_arr__"
-    # Save parameters configuration in the filename
+    # Record parameters configuration in the filename
     filename += f"T={T}_K={K}_S={S}_N={N}__"
-    # Save noise type and parameter
-    filename += f"noise_type={noise_type}_parameter={parameter}"
+    # Record noise type and parameter
+    # OSS: for gaussian noise we're recording standard deviation, not variance
+    par_name_val = "stdev" if noise_type=='gaussian' else "alpha" 
+    filename += f"noise_type={noise_type}_{par_name_val}={parameter}"
+    return filename
+
+def return_subdir_name(T:int,
+                    K:int,
+                    S:int,
+                    N:int,
+                    noise_type:str,
+                    parameter:float) -> str:
+    # Record parameters configuration in the subdirectory's name
+    subdir_name = f"T={T}_K={K}_S={S}_N={N}__"
+    # Record noise type and parameter
+    # OSS: for gaussian noise we're recording standard deviation, not variance
+    par_name_val = "stdev" if noise_type=='gaussian' else "alpha" 
+    subdir_name += f"noise_type={noise_type}_{par_name_val}={parameter}"
+    return subdir_name
 
 def save_observation(array:np.ndarray,
                      filename:str,
