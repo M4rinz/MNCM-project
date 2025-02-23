@@ -1,4 +1,8 @@
 ### python related .gitignore ###
+
+# The data folder contains a lot of saved arrays
+Codice/data/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

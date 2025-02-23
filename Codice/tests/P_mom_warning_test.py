@@ -9,12 +9,10 @@ import warnings
 sys.path.append(os.path.abspath(os.path.join('..')))
 
 from utilities.estimators import P_mom_stationary
-from utilities.data import generate_random_P, create_observations, return_subdir_name, save_observation
+from utilities.data import generate_random_P, create_observations
 from utilities.num_methods import compute_stationary_LU_GTH
 
 import numpy as np
-from itertools import product
-from tqdm import tqdm
 
 # Default parameters
 S = 10

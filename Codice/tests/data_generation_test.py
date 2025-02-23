@@ -67,9 +67,9 @@ for T, K, i, noise_type in tqdm(prod):
 	#	'TxK': T*K,
 	#}
 	#if noise_type == 'gaussian':
-	#	dict_entry['stdev'] = parameter[i]
+	#	dict_entry['stdev'] = parameter
 	#else:
-	#	dict_entry['alpha'] = parameter[i]
+	#	dict_entry['alpha'] = parameter
 	
 	# Create subdirectory name according to a standard
 	subdir_name = return_subdir_name(T=T, K=K, S=S, N=N,
