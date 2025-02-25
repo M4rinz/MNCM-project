@@ -11,7 +11,8 @@ from utilities.estimators import P_mom_stationary
 import numpy as np
 
 def error_computation(M:np.ndarray) -> float:
-	return np.linalg.norm(M - P, 'fro')/(S**2)
+	sqnorm = np.linalg.norm(M - P, 'fro')**2
+	return sqnorm/(S**2)
 
 ## Ok let's start
 
@@ -21,7 +22,7 @@ SEED = 42
 VERBOSE = False
 
 #P = generate_random_P(S)
-P = generate_random_P(S, 'dirichlet', precision=D, seed=SEED)
+P = generate_random_P(S)#, 'dirichlet', precision=D, seed=SEED)
 pi = compute_stationary_LU_GTH(P=P)
 if VERBOSE:
 	print("pi =")
@@ -32,7 +33,7 @@ if VERBOSE:
 #T = 10	# n° of total timesteps
 #K = 1	# n° of total repetitions
 T = 10000
-K = 20
+K = 25
 N = 100
 
 # Change here to change the variance

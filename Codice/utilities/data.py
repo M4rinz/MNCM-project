@@ -156,10 +156,10 @@ def create_observations(T:int, K:int, N:int,
         rng = np.random.default_rng()
 
     S = P.shape[0]
-    noise_type = kwargs.get('noise_type')
+    #noise_type = kwargs.get('noise_type')
     # To create noisy observations with the binomial distribution int type is needed 
-    n_t_vector = np.zeros((T,K,S), dtype='int64')   
-    y_t_vector = np.zeros((T,K,S), dtype='int64' if noise_type in ['binomial'] else 'float64')
+    n_t_vector = np.zeros((T,K,S))#, dtype='int64')   
+    y_t_vector = np.zeros((T,K,S))#, dtype='int64' if noise_type in ['binomial'] else 'float64')
     A_t_vector = np.zeros((T,S,S))
 
     # Initial population is a multinomial draw from the initial distribution
@@ -169,7 +169,7 @@ def create_observations(T:int, K:int, N:int,
     n_t_vector[0,:,:] = n_0
 
     for t in range(T-1):
-        n_tp1 = np.zeros((K,S), dtype='int64')
+        n_tp1 = np.zeros((K,S))#, dtype='int64')
         # P[i,:] encodes the probability of going from state i to another states. 
         # Thus, to simulate where the n_t(i) individuals that are in state i at time t
         # go in the next timestep t+1, we sample from a multinomial distribution

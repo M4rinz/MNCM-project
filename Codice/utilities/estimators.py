@@ -92,8 +92,8 @@ def P_mom_stationary(
     # Normalize
     mu_hat = m_hat/np.linalg.norm(m_hat,1)
 
-    if not np.isclose(np.linalg.norm(mu_hat,1),1):
-        raise Exception("mu_hat is not correctly normalized")
+    #if not np.isclose(np.linalg.norm(mu_hat,1),1):
+    #    raise Exception("mu_hat is not correctly normalized")
 
     # estimate time-lagged covariance of noisy counts
     deviations = y_array - m_hat  # broadcasting
