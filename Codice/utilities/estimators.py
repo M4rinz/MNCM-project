@@ -110,27 +110,73 @@ def P_mom_stationary(
 
 
 # ################################# COMPUTATION OF P_CLS #################################
-    
+
+
 def P_cls_stationary(y_array:np.ndarray,
-                     rcond:float=-1):
+                     rcond:float=-1) -> np.ndarray:
     """Computes the Conditional Least Squares approximation of the
     transition matrix P or a Markov chain, using noisy aggregated 
     data from all timesteps (strongly stationary case).
     Since the data comes from multiple repetitions, an average is taken. 
 
     The function uses `np.linalg.lstsq` to solve the linear 
-    least square problem that appears. 
+    least square problem `ArgMin_u ||X @ u - Y[:,i]||` (`u` is a column
+    vector of length `S = y_array.shape[2]` in this case)
+    that appears. 
+
+    The difference between the result returned by this function and 
+    the one returned by `P_cls_stationary_matrix` should be in the 
+    order of machine precision.
 
     Args:
         y_array (np.ndarray): array of shape (T,K,S) with the noisy aggregated observations
         rcond (float, optional): rcond parameter for NumPy. Defaults to -1.
 
     Returns:
-        _type_: _description_
+        P_cls (np.ndarray): the `SxS` estimation of the transition matrix.
+    """
+    _, K, S = y_array.shape
+    # "flip" dimensions T and K 
+    X = y_array[:-1].transpose(1,0,2)   #X.shape = (K, (T-1), S)
+    Y = y_array[1:].transpose(1,0,2)
+
+    P_cls = np.zeros((K,S,S))
+    for k in range(K):
+        for s in range(S):
+            # solve the least square system to find the column of P
+            P_cls[k,:,s] = np.linalg.lstsq(X[k], Y[k,:,s],rcond=rcond)[0]
+
+    # We take an average over the K trials
+    P_cls = P_cls.mean(axis=0)
+
+    return P_cls
+
+def P_cls_stationary_matrix(y_array:np.ndarray,
+                             rcond:float=-1) -> np.ndarray:
+    """Computes the Conditional Least Squares approximation of the
+    transition matrix P or a Markov chain, using noisy aggregated 
+    data from all timesteps (strongly stationary case).
+    Since the data comes from multiple repetitions, an average is taken. 
+
+    The function uses `np.linalg.lstsq` to solve the linear 
+    least square problem `ArgMin_P ||X @ P - Y||` (`P` is square 
+    matrix of size `S = y_array.shape[2]` in this case)
+    that appears. 
+
+    The difference between the result returned by this function and 
+    the one returned by `P_cls_stationary` should be in the order of 
+    machine precision.
+
+    Args:
+        y_array (np.ndarray): array of shape (T,K,S) with the noisy aggregated observations
+        rcond (float, optional): rcond parameter for NumPy. Defaults to -1.
+
+    Returns:
+        P_cls (np.ndarray): the `SxS` estimation of the transition matrix.
     """
     _, K, _ = y_array.shape
     # "flip" dimensions T and K 
-    X = y_array[:-1].transpose(1,0,2)
+    X = y_array[:-1].transpose(1,0,2)   #X.shape = (K, (T-1), S)
     Y = y_array[1:].transpose(1,0,2)
     # We take an average over the K trials
     coll_P_cls = np.array([np.linalg.lstsq(X[k], Y[k],rcond=rcond)[0] for k in range(K)])
