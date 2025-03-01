@@ -268,71 +268,25 @@
 
 
 
-\section{Stimatori per \texorpdfstring{$P$}{P}}
-	\subsection{Minimi quadrati condizionati}
-
-	\begin{frame}
-		{\hypertarget{frame:CLS}{Minimi quadrati condizionati}}
-		Lo stimatore dei minimi quadrati condizionati (CLS) si basa sull'idea che
-		$\vb*{n}_{t}\approx\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]$.
-		\onslide<2->{Si dimostra (cfr. Appendice~\hyperlink{frame:dettagli_val_atteso_condiz_nt:appendice}{\faHandPointRight})
-		che $\mathbb{E}\qty[\transpose{\vb*{n}_t}\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
-		\smallskip
-
-		\onslide<3->{Siano 
-		\vspace*{-0.5\baselineskip}
-		\begin{align*}		
-			\R{(T-1)}{S}\ni X &\coloneqq
-			\left(\begin{array}{c|c|c|c}
-				%\hline
-				\vb*{n}_1 & \vb*{n}_2 & \dots & \vb*{n}_{T-1} \\
-				%\hline
-			\end{array}\right)^{\top}\\
-			\R{(T-1)}{S}\ni Y &\coloneqq
-			\left(\begin{array}{c|c|c|c}
-				%\hline
-				\vb*{n}_2 & \vb*{n}_3 & \dots & \vb*{n}_{T} \\
-				%\hline
-			\end{array}\right)^{\top}
-		\end{align*}}
-
-		\onslide<4->{L'insieme di relazioni $\transpose{\vb*{n}_t}\approx\transpose{\vb*{n}_{t-1}}P\quad\forall\,t\in\qty{2,\dots,T}$
-		definisce un problema ai minimi quadrati $\norm{XP-Y}_{F}^2$ {\smaller (cfr. Appendice~\hyperlink{frame:interpretare_CLS:appendice}{\faHandPointRight})}, di cui 
-		lo stimatore CLS è la soluzione:
-		\[
-			\hat{P}_{\textup{CLS}}\coloneqq\argmin_P\norm{XP-Y}_{F}^2=\qty(\transpose{X}X)^{-1}\transpose{X}Y
-		\]}
-
-        \onslide<5->{Considerazioni (cfr. Appendice~\hyperlink{frame:proprieta_P_CLS:appendice}{\faHandPointRight}):}
-        \begin{enumerate}
-            \item<5-> \textcolor{red}{invertibilità di $\transpose{X}X$} %in pratica, è un minor issue
-            \item<6-> $\hat{P}_{\textup{CLS}}\cdot e=e$
-            \item<7-> Non è vero che $\hat{P}_{\textup{CLS}}\ge 0$, in generale.
-        \end{enumerate}
-
-	\end{frame}
-
-
-	\subsection{Metodo dei momenti}
-
+\section{Stimare \texorpdfstring{$P$}{P} con il metodo dei momenti}
+	
 	\begin{frame}
 		{\hypertarget{frame:prop_1}{Momenti primi e secondi}}
 		
 		\setbeamercovered{transparent}
 		\begin{notazione}
-			Denotiamo \onslide<1,4->{il momento primo}\onslide<4->{,} 
-			\onslide<2,3->{i momenti secondi }\onslide<2,4->{centrali}
-			\onslide<4->{e }\onslide<3->{non centrali} con:
-			\vspace{-0.5\baselineskip}
-			\begin{align*}
-				\onslide<1,4->{\R{S}\ni\,&\vb*{m}_t\coloneqq\mathbb{E}\qty[\vb*{n}_t]} & & \\
-				\onslide<2,4->{\R{S}{S}\ni\,&\Sigma_t\coloneqq\Var{\vb*{n}_t}} & \onslide<3->{\R{S}{S}\ni\,&\Lambda_t\coloneqq\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]}\\
-				\onslide<2,4->{\R{S}{S}\ni\,&\Sigma_{t,t+1}\coloneqq\Cov{\vb*{n}_t,\vb*{n}_{t+1}}} & \onslide<3->{\R{S}{S}\ni\,&\Lambda_{t,t+1}\coloneqq\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]}
-			\end{align*}
+			Denotiamo \onslide<1,3->{il momento primo}\onslide<3->{ e} 
+			\onslide<2,3->{i momenti secondi centrali} con:
+			%\vspace{-0.5\baselineskip}
+            \begin{align*}
+                \onslide<1,3->{\R{S}\ni\,&\vb*{m}_t\coloneqq\mathbb{E}\qty[\vb*{n}_t]} & 
+                \onslide<2,3->{\R{S}{S}\ni\,&\Sigma_t\coloneqq\Var{\vb*{n}_t}} & 
+                \onslide<2,3->{\R{S}{S}\ni\,&\Sigma_{t,t+1}\coloneqq\Cov{\vb*{n}_t,\vb*{n}_{t+1}}}\\
+            \end{align*}
 		\end{notazione}
 		\setbeamercovered{invisible}
 
-		\begin{proposizione}<5->\label{prop:formule_momenti}
+		\begin{proposizione}<4->\label{prop:formule_momenti}
 			\vspace{-0.25\baselineskip}
 			Per ogni $t\in[T]$, si ha:
 			\vspace{-0.25\baselineskip}
@@ -340,73 +294,20 @@
 				\begin{column}{0.45\textwidth}
 					\begin{enumerate}
 						\item $\vb*{m}_t=N\vb*{\mu}_t$
-						\item $\Sigma_t=N\cdot\qty(\operatorname{Diag}(\vb*{\mu}_t)-\vb*{\mu}_t\transpose{\vb*{\mu}_t})$	
-						\item $\Sigma_{t,t+1}=N\cdot\qty(\vb*{\mu}_{t,t+1}-\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
 					\end{enumerate}
 				\end{column}
 				\begin{column}{0.55\textwidth}
 					\begin{enumerate}
-						\setcounter{enumi}{3}
-						\item $\Lambda_t=N\cdot\qty(\operatorname{Diag}(\vb*{\mu}_t)+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})$
-						\item $\Lambda_{t,t+1}=N\cdot\qty(\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
+						\setcounter{enumi}{1}
+                        \item $\Sigma_t=N\cdot\qty(\operatorname{Diag}(\vb*{\mu}_t)-\vb*{\mu}_t\transpose{\vb*{\mu}_t})$	
+                        \item $\Sigma_{t,t+1}=N\cdot\qty(\vb*{\mu}_{t,t+1}-\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
 					\end{enumerate}
 				\end{column}				
 			\end{columns}
 		\end{proposizione}
-		\begin{proof}<6->
+		\begin{proof}<5->
 			Cfr. Appendice~\hyperlink{frame:dim_prop_1:appendice}{\faHandPointRight}
 		\end{proof}
-	\end{frame}
-
-	\begin{frame}
-		{\hypertarget{frame:CLS_as_moment}{Lo stimatore CLS come stimatore dei momenti 1/2}}
-		{Ricavare $\hat{P}_{\textup{CLS}}$ con il metodo dei momenti}
-
-		Si dimostra (Cfr. Appendice~\hyperlink{frame:dim_prop_2:appendice}{\faHandPointRight})
-		che $P=\Lambda_t^{-1}\Lambda_{t,t+1}$. \onslide<2->{Inoltre, posto
-		\begin{align*}
-			\hat{\Lambda}_t&\coloneqq\frac{1}{T-1}\transpose{X}X=\frac{1}{T-1}\sum_{t=1}^{T-1}\vb*{n}_t\transpose{\vb*{n}_t}\qquad\text{e}\\
-			\hat{\Lambda}_{t,t+1}&\coloneqq\frac{1}{T-1}\transpose{X}Y=\frac{1}{T-1}\sum_{t=1}^{T-1}\vb*{n}_t\transpose{\vb*{n}_{t+1}},
-		\end{align*}
-		si ha $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t^{-1}\hat{\Lambda}_{t,t+1}$.}
-		\smallskip
-
-		\onslide<3->{$\hat{\Lambda}_t$ e $\hat{\Lambda}_{t,t+1}$ si possono interpretare come 
-		"stime empiriche" di 
-		$\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]=\Lambda_t$ e 
-		$\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]=\Lambda_{t,t+1}$ rispettivamente.}
-		\smallskip
-
-		\onslide<4->{Dunque $\hat{P}_{\textup{CLS}}=\hat{\Lambda}_t^{-1}\hat{\Lambda}_{t,t+1}$ 
-		ha un'interpretazione come stimatore ottenuto con il \emph{metodo dei momenti}.} 
-
-	\end{frame}
-
-	\begin{frame}
-		{Lo stimatore CLS come stimatore dei momenti 2/2}
-		{$\hat{P}_{\textup{CLS}}$ non è consistente}
-
-		%Supponiamo $\vb*{y}_t=\vb*{n}_t+\epsilon_t\quad\forall\,t\in[T]$, con 
-		%$\epsilon_t\independent\epsilon_{t'}$, $\mathbb{E}\qty[\epsilon_t]=0$,
-		%$\Var{\epsilon_t}=<\infty\quad\forall\,t\ne t'$. 
-
-		Supponiamo $\vb*{y}_t=\vb*{n}_t+\epsilon_t$, con 
-		$\mathbb{E}\qty[\epsilon_t]=0$, $\Var{\epsilon_t}<\infty,\epsilon_t\independent\vb*{n}_t\quad\forall\,t\in[T]$,
-		e $\epsilon_t\independent\epsilon_{t'}\quad\forall\,t\ne t'$.
-        \smallskip
-  
-		\onslide<2->{Si ha $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_t}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_t}]+\Var{\epsilon_t}$,
-		e $\mathbb{E}\qty[\vb*{y}_t\transpose{\vb*{y}_{t+1}}]=\mathbb{E}\qty[\vb*{n}_t\transpose{\vb*{n}_{t+1}}]$.}
-		\smallskip
-
-		\onslide<3->{Dunque con osservazioni rumorose
-		\[
-			\hat{P}_{\textup{CLS}}=\qty(\hat{\Lambda}_t+\Var{\epsilon_t})^{-1}\hat{\Lambda}_{t,t+1}\xcancel{\overset{T\to\infty}{\longrightarrow}P}
-		\]
-		ossia $\hat{P}_{\textup{CLS}}$ non è consistente con osservazioni rumorose.}
-		\smallskip
-
-		\onslide<4->{Il prossimo stimatore sarà consistente anche con osservazioni rumorose.}
 	\end{frame}
 
 	\begin{frame}
@@ -772,115 +673,6 @@
 	\end{frame}
 
 	\begin{frame}
-		{\hypertarget{frame:dettagli_val_atteso_condiz_nt:appendice}{Calcolo di $\mathbb{E}\qty[\vb*{n}_t\mid\vb*{n}_{t-1}]$}}
-
-		Sia $T_{i,j}^{(t-1)}$ la v.a. che conta il numero di individui che, all'istante $t-1\in[T]$,
-		si spostano dallo stato $i\in[S]$ a $j\in[S]$. Allora $\vb*{n}_t(j)=\sum_{i=1}^S T_{i,j}^{(t-1)}$.
-		\smallskip
-
-		\onslide<2->{Conoscendo $\vb*{n}_{t-1}(i)$, $T_{i,j}^{(t-1)}$ è 
-		binomiale di parametri $\vb*{n}_{t-1}(i)$ e $P_{i,j}$:
-		%$\P{T_{i,j}^{(t-1)}}{\vb*{n}_{t-1}}=\mathcal{B}\qty(\vb*{n}_t(i),(P_{i,j},1-P_{i,j});2)$
-		\[
-			\P{T_{i,j}^{(t-1)}=\alpha}{\vb*{n}_{t-1}}=\smqty(\vb*{n}_{t-1}(i)\\ \alpha)\cdot P_{i,j}^{\alpha}\cdot(1-P_{i,j})^{1-\alpha}
-		\]}
-		%\vspace*{-0.5\baselineskip}
-
-		\onslide<3->{Ne segue che 
-		\vspace*{-0.5\baselineskip}
-		\begin{align*}
-			\mathbb{E}\qty[\vb*{n}_t(j)\mid\vb*{n}_{t-1}]&=\sum_{i=1}^S \mathbb{E}\qty[T_{i,j}^{(t-1)}\mid\vb*{n}_{t-1}]=\sum_{i=1}^{S}\mathbb{E}\qty[T_{i,j}^{(t-1)}\mid\vb*{n}_{t-1}(i)]\\
-			&=\sum_{i=1}^{S}\vb*{n}_{t-1}(i)P_{i,j}=\qty(\transpose{\vb*{n}_{t-1}}P)_j
-		\end{align*}
-		Ovvero $\mathbb{E}\qty[\transpose{\vb*{n}_t}\mid\vb*{n}_{t-1}]=\transpose{\vb*{n}_{t-1}}P$.}
-
-
-		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
-	\end{frame}
-
-    \begin{frame}
-        {\hypertarget{frame:interpretare_CLS:appendice}{Dettagli su come ricavare \texorpdfstring{$\hat{P}_{\textup{CLS}}$}{P_cls}$\quad 1/2$}}
-        
-        %$\vb*{n}_{t}\approx\transpose{\vb*{n}}_{t-1}P=\mathbb{E}\qty[\transpose{\vb*{n}}_t\mid\vb*{n}_{t-1}]$ può essere pensata come
-        
-        \textbf{Idea}: $\vb*{n}_t\approx\transpose{\vb*{n}_{t-1}}P$. Leggendo questa equazione nella componente $i\in[S]$ si ricava
-        \begin{equation}\label{eqn:cls_interpretation}
-            \vb*{n}_t(i)\approx(\transpose{\vb*{n}_{t-1}}P)_i=\transpose{\vb*{n}_{t-1}}P_{:,i}
-        \end{equation}
-        
-        Dunque, considerando tutti i $t\in[T]$, si ha $Y_{:,i}\approx XP_{:,i}$. 
-        \smallskip     
-        
-        \begin{oss*}
-            Possiamo leggere la~\eqref{eqn:cls_interpretation} come:
-            %$P_{:,i}$: probabilità di andare in $i$ al passo successivo. 
-            \[
-                \transpose{\vb*{n}}_{t-1}P_{:,i}=\sum_{s\in S}\vb*{n}_{t-1}(s)P_{s,i}=
-                \sum_{s\in S}\underbrace{\qty|\qty{m\in[N]\mid x_{t-1}^m=s}|}_{\text{N° individui in }s\in S}\underbrace{\P{x_t=i}{x_{t-1}=s}}_{\text{Prob. di andare da }s\text{ a }i}
-            \]
-        \end{oss*}
- 
-        $P$ è ignota e va stimata. Per la discussione precedente, ha senso scegliere 
-        \[
-            \hat{P}_{:,i}=\argmax_{u\in\R{S}}\norm{Xu-Y_{:,i}}_2^2\quad\forall\,i\in[S].
-        \]
-        
-        La stima di $P$ è dunque data da 
-        \[
-            \R{S}{S}\ni\hat{P}_{\textup{CLS}}=\left(\begin{array}{c|c|c}\hat{P}_{:,1} & \dots & \hat{P}_{:,S}\end{array}\right).
-        \]
-
-        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
-    \end{frame}
-
-    \begin{frame}
-        {Dettagli su come ricavare \texorpdfstring{$\hat{P}_{\textup{CLS}}$}{P_cls}$\quad 2/2$}
-        
-        Per ottenere $\hat{P}_{\textup{CLS}}$ va risolto $\sum_{i=1}^S\argmax_{u_i\in\R{S}}\norm{Xu_i-Y_{:,i}}_2^2$ {\smaller (max ogni addendo separatamente)}. Ma ({\smaller $U\equiv(u_1\mid\dots\mid u_S)$})
-        \[
-            \sum_{i=1}^S\norm{Xu_i-Y_{:,i}}_2=\norm{\qty(X\otimes I)\operatorname{Vec}(U)-\operatorname{Vec}(Y)}_F^2=\norm{XU-Y}_F^2.
-        \]
-        Se $\transpose{X}X$ è invertibile, $\hat{P}_{:,i}=(\transpose{X}X)^{-1}\transpose{X}Y_{:,1}$, dunque $\hat{P}_{\textup{CLS}}=(\transpose{X}X)^{-1}\transpose{X}Y$.
-        
-        Si ottiene dunque quanto scritto in~\cite{article:main}, e citato precedentemenete:
-        \[
-			\hat{P}_{\textup{CLS}}\coloneqq\argmin_U\norm{XU-Y}_{F}^2=\qty(\transpose{X}X)^{-1}\transpose{X}Y
-		\]
-        \vspace*{-1\baselineskip}
-        \begin{oss*}
-            Quanto visto dice esplicitamente che per ottenere una colonna di $\hat{P}_{\textup{CLS}}$ si risolve un sistema ai minimi quadrati.
-
-            Non c'è garanzia che $\hat{P}_{\textup{CLS}}\ge 0$. Bisognerebbe introdurre un problema di ottimizzazione vincolata.
-        \end{oss*}
-
-        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
-    \end{frame}
-
-    \begin{frame}
-        {\hypertarget{frame:proprieta_P_CLS:appendice}{Proprietà di $\hat{P}_{\textup{CLS}}$}}
-
-        \begin{enumerate}
-            \item \textcolor{red}{Si suppone che $T\gg S$, dunque $\transpose{X}X$ è invertibile $\iff\rank{X}=S$. 
-            \[
-                X=\sum_{m=1}^N
-                 \left(\begin{array}{c|c|c}
-				    V_1^{(m)} & \dots & V_{T-1}^{(m)} \\  
-                \end{array}\right)^{\top}
-                \equiv\sum_{m=1}^N\mathcal{V}^{(m)}, \quad\mathcal{V}^{(m)}\in\qty{0,1}^{(T-1)\times S}
-            \]
-            \textbf{Idea}: $P$ è ergodica, quindi se $T$ è grande abbastanza, qualsiasi stato è visitato. Se qualsiasi stato fosse visitato, $\mathcal{V}^{(m)}$ avrebbe $e_1,\dots,e_S$ tra le sue righe; dunque si avrebbe $\rank\mathcal{V}^{(m)}=S\quad\forall m\in[N]$}
-            \item Osserviamo che $X e=Y e=N\cdot e$. Dunque
-            \[
-                \hat{P}_{\textup{CLS}} e=e\iff \transpose{X}Ye=\transpose{X}Xe\iff N\cdot\transpose{X}e=N\cdot\transpose{X}e
-            \]
-            \item Siano $X\coloneqq\mqty(5 & 5 \\ 9 & 1), Y\coloneqq\mqty(9 & 1\\1 & 9)$. 
-            Si ottiene $\hat{P}_{\textup{CLS}}=\frac{1}{10}\mqty(-1 & 11 \\ 19 & -9)\not\ge 0$.
-        \end{enumerate}
-
-        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS}{\faHandPointLeft}}
-    \end{frame}
-
-	\begin{frame}
 		{\hypertarget{frame:dim_prop_1:appendice}{Dimostrazione della Proposizione~\ref{prop:formule_momenti}$\qquad$ 1/4}}
 		\begin{block}{Dimostrazione.}
 			$\vb*{n}_t$ è multinomiale di parametri $N$ e $\vb*{\mu}_t$, 
@@ -1000,45 +792,6 @@
 
 		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:prop_1}{\faHandPointLeft}}		
 	\end{frame}
-
-	\begin{frame}
-		{\hypertarget{frame:dim_prop_2:appendice}{Dimostrazione $P=\Lambda_t^{-1}\Lambda_{t,t+1}\qquad 1/2$}}
-	
-		\begin{block}{Dimostrazione.}
-			$\Lambda_t=N\cdot\qty(\operatorname{Diag}\qty(\vb*{\mu}_t)+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})$
-			è somma di una matrice invertibile e di una matrice di rango 1.
-
-			Esiste un'espressione esplicita per $\Lambda_t$ (formula di Sherman-Morrison): 
-			denotando $D\equiv\operatorname{Diag}\qty(\vb*{\mu}_t)$ e con $\vb*{e}$ il 
-			vettore con tutte le entrate uguali a $1$,
-			\begin{align*}
-				\Lambda_t^{-1}&=\frac{1}{N}\qty(D+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})^{-1}\\
-				&=\frac{1}{N}\qty(D^{-1}-\frac{(N-1)D^{-1}\vb*{\mu}_t\transpose{\vb*{\mu}_t}D^{-1}}{1+(N-1)\transpose{\vb*{\mu}_t}D^{-1}\vb*{\mu}_t})\\
-				&=\frac{1}{N}\qty(D^{-1}-\frac{N-1}{N}\vb*{e}\transpose{\vb*{e}})
-			\end{align*}
-			Infatti $D^{-1}\vb*{\mu}_t=\vb*{e}$, e poiché 
-			$\vb*{\mu}_t$ è un vettore stocastico $\langle\vb*{e},\vb*{\mu}_t\rangle=1$.
-		\end{block}
-
-		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS_as_moment}{\faHandPointLeft}}
-	\end{frame}
-
-	\begin{frame}
-		{Dimostrazione $P=\Lambda_t^{-1}\Lambda_{t,t+1}\qquad 2/2$}
-		
-			\begin{block}{}
-				Dimostriamo dunque che $\Lambda_tP=\Lambda_{t,t+1}$:
-				\begin{align*}
-					\Lambda_tP&=N\qty(D+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t})P\\
-					&=N\qty(DD^{-1}\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_t}P)\\
-					&=N\qty(\vb*{\mu}_{t,t+1}+(N-1)\vb*{\mu}_t\transpose{\vb*{\mu}_{t+1}})=\Lambda_{t,t+1}
-				\end{align*}
-				ossia la tesi.\hfill\qedsymbol
-			\end{block}
-
-		\blankfootnote{\textbf{Indietro:}~\hyperlink{frame:CLS_as_moment}{\faHandPointLeft}}
-	\end{frame}
-
 
 	\begin{frame}
 		{\hypertarget{frame:dim_prop_noise_model:appendice}{Dimostrazione della proposizione~\ref{prop:noise_model}}}
