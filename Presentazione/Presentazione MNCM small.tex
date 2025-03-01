@@ -127,8 +127,29 @@
 	\end{frame}
 	
 	\setcounter{tocdepth}{2}  
-    
+
 \section{Analisi teorica}
+
+    \begin{frame}
+        {\hypertarget{frame:P_mom_stochastic}{Osservazioni su $\hat{P}_{\textup{MoM}}$}}
+        In alcuni casi, per effetto del rumore, $\hat{\vb*{m}}_t=\frac{1}{K}\sum_{k=1}^K\vb*{y}_t^{(k)}$ potrebbe essere negativo. \onslide<2->{Dunque potrebbe essere $\hat{P}_{\textup{MoM}}\le 0$}.
+        \smallskip 
+        
+        \onslide<3->{Nel caso $\hat{\vb*{m}}\ge 0$, si ha (cfr. Appendice~\hyperlink{frame:P_mom_stochastic:appendice}{\faHandPointRight}) $\hat{P}_{\textup{MoM}}\vb*{e}=\vb*{e}\iff\hat{\Sigma}\vb*{e}=0$.} 
+    
+        \onslide<4->{Supponendo per semplicità $K=1$ e rumore gaussiano $\vb*{y}_t=\vb*{n}_t+\epsilon_t$, si ha 
+        \[
+            \hat{\Sigma}\vb*{e}=0\iff\sum_{t=1}^{T-1}\langle r_{t+1},\vb*{e}\rangle\cdot r_t=0\iff 
+            \begin{multlined}[t]
+                \langle\vb*{m}_{\epsilon},\vb*{e}\rangle\cdot\big((T+1)\hat{\vb*{m}}-\vb*{y}_T\big)+\\+\langle\epsilon_1,\vb*{e}\rangle\cdot\hat{\vb*{m}}+\sum_{t=1}^{T-1}\langle\epsilon_{t+1},\vb*{e}\rangle\cdot\vb*{y}_t
+            \end{multlined}
+        \]
+        dove $r_t=\vb*{y}_{t}-\hat{\vb*{m}}$; e $\vb*{m}_{\epsilon}=\frac{1}{T}\sum_{t=1}^T\epsilon_t$ è tale che $\hat{\vb*{m}}=\vb*{m}_{\epsilon}+\frac{1}{T}\sum_{t=1}^T\vb*{n}_t$.}
+
+        \onslide<5->{Dunque in assenza di rumore $\hat{\Sigma}\vb*{e}=0$, ma in generale $\hat{P}_{\textup{MoM}}$ \emph{non} è stocastica.}
+        
+    \end{frame}
+
 
     \begin{frame}
         {\hypertarget{frame:teorema_1_part1}{$\hat{P}_{\textup{MoM}}$ è consistente$\qquad 1/3$}}
@@ -153,7 +174,7 @@
                     \item<5-> Per la legge dei grandi numeri, $\lim_K\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_t]$ q.c.
                     \onslide<6->{Dunque 
                     $\lim_K\hat{\vb*{m}}=\lim_k\frac{1}{T}\sum_{t=1}^T\hat{\vb*{m}}_t=\mathbb{E}\qty[\vb*{y}_1]$ q.c.
-                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_mhat:appencide}{\faHandPointRight})}
+                    (cfr. Appendice~\hyperlink{frame:teorema1_lim_mhat:appendice}{\faHandPointRight})}
                     \item<7-> Similmente si dimostra che $\lim_K\hat{\Sigma}_{t,t+1}=\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
                     e dunque $\hat{\Sigma}=\frac{1}{T-1}\sum_{t=1}^{T-1}\hat{\Sigma}_{t,t+1}\overset{K\to\infty}{\longrightarrow}\Cov{\vb*{y}_1,\vb*{y}_2}$ q.c.
                     (cfr. Appendice~\hyperlink{frame:teorema1_lim_Sigmahat:appendice}{\faHandPointRight})
@@ -290,10 +311,111 @@
 		\end{center}
 	\end{frame}
 
+    \begin{frame}
+        {Dettagli su come ricavare \texorpdfstring{$\hat{P}_{\textup{CLS}}$}{P_cls}$\quad 1/2$}
+        
+        %$\vb*{n}_{t}\approx\transpose{\vb*{n}}_{t-1}P=\mathbb{E}\qty[\transpose{\vb*{n}}_t\mid\vb*{n}_{t-1}]$ può essere pensata come
+        
+        \textbf{Idea}: $\vb*{n}_t\approx\transpose{\vb*{n}_{t-1}}P$. Leggendo questa equazione nella componente $i\in[S]$ si ricava
+        \begin{equation}\label{eqn:cls_interpretation}
+            \vb*{n}_t(i)\approx(\transpose{\vb*{n}_{t-1}}P)_i=\transpose{\vb*{n}_{t-1}}P_{:,i}
+        \end{equation}
+        
+        Dunque, considerando tutti i $t\in[T]$, si ha $Y_{:,i}\approx XP_{:,i}$. 
+        \smallskip     
+        
+        \begin{oss*}
+            Possiamo leggere la~\eqref{eqn:cls_interpretation} come:
+            %$P_{:,i}$: probabilità di andare in $i$ al passo successivo. 
+            \[
+                \transpose{\vb*{n}}_{t-1}P_{:,i}=\sum_{s\in S}\vb*{n}_{t-1}(s)P_{s,i}=
+                \sum_{s\in S}\underbrace{\qty|\qty{m\in[N]\mid x_{t-1}^m=s}|}_{\text{N° individui in }s\in S}\underbrace{\P{x_t=i}{x_{t-1}=s}}_{\text{Prob. di andare da }s\text{ a }i}
+            \]
+        \end{oss*}
+ 
+        $P$ è ignota e va stimata. Per la discussione precedente, ha senso scegliere 
+        \[
+            \hat{P}_{:,i}=\argmax_{u\in\R{S}}\norm{Xu-Y_{:,i}}_2^2\quad\forall\,i\in[S].
+        \]
+        
+        La stima di $P$ è dunque data da 
+        \[
+            \R{S}{S}\ni\hat{P}_{\textup{CLS}}=\left(\begin{array}{c|c|c}\hat{P}_{:,1} & \dots & \hat{P}_{:,S}\end{array}\right).
+        \]
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Dettagli su come ricavare \texorpdfstring{$\hat{P}_{\textup{CLS}}$}{P_cls}$\quad 2/2$}
+        
+        Per ottenere $\hat{P}_{\textup{CLS}}$ va risolto $\sum_{i=1}^S\argmax_{u_i\in\R{S}}\norm{Xu_i-Y_{:,i}}_2^2$ {\smaller (max ogni addendo separatamente)}. Ma ({\smaller $U\equiv(u_1\mid\dots\mid u_S)$})
+        \[
+            \sum_{i=1}^S\norm{Xu_i-Y_{:,i}}_2=\norm{\qty(X\otimes I)\operatorname{Vec}(U)-\operatorname{Vec}(Y)}_F^2=\norm{XU-Y}_F^2.
+        \]
+        Se $\transpose{X}X$ è invertibile, $\hat{P}_{:,i}=(\transpose{X}X)^{-1}\transpose{X}Y_{:,1}$, dunque $\hat{P}_{\textup{CLS}}=(\transpose{X}X)^{-1}\transpose{X}Y$.
+        
+        Si ottiene dunque quanto scritto in~\cite{article:main}, e citato precedentemenete:
+        \[
+			\hat{P}_{\textup{CLS}}\coloneqq\argmin_U\norm{XU-Y}_{F}^2=\qty(\transpose{X}X)^{-1}\transpose{X}Y
+		\]
+        \vspace*{-1\baselineskip}
+        \begin{oss*}
+            Quanto visto dice esplicitamente che per ottenere una colonna di $\hat{P}_{\textup{CLS}}$ si risolve un sistema ai minimi quadrati.
+
+            Non c'è garanzia che $\hat{P}_{\textup{CLS}}\ge 0$. Bisognerebbe introdurre un problema di ottimizzazione vincolata.
+        \end{oss*}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Dettagli sulla stocasticità di \texorpdfstring{$\hat{P}_{\textup{MoM}}$}{P_mom} 1/2}
+        {\hypertarget{frame:P_mom_stochastic:appendice}{\texorpdfstring{$\hat{P}_{\textup{MoM}}$}{P_mom} è stocastica se e solo se \texorpdfstring{$\hat{\Sigma}\vb*{e}=\vb*{e}$}{Sigma*e=e}}}
+
+        Si ha 
+        \[
+            \hat{P}_{\textup{MoM}}\vb*{e}=\vb*{e}\iff\qty(\frac{1}{N}\hat{\Sigma}+\hat{\vb*{\mu}}\transpose{\hat{\vb*{\mu}}})\vb*{e}=\operatorname{Diag}(\hat{\vb*{\mu}})\vb*{e}\iff\frac{1}{N}\hat{\Sigma}\vb*{e}+\langle\hat{\vb*{\mu}},\vb*{e}\rangle\cdot\hat{\vb*{\mu}}=\hat{\vb*{\mu}}
+        \]
+        \onslide<2->{Se $\hat{\vb*{m}}\ge 0$ allora $\norm{\hat{\vb*{m}}}_1=\langle\hat{\vb*{m}},\vb*{e}\rangle$, dunque se $\hat{\vb*{m}}\ge 0$ allora $\langle\hat{\vb*{\mu}},\vb*{e}\rangle=1$.}
+
+        \onslide<3->{Dunque nel caso $\hat{\vb*{m}}\ge 0$ vale $\hat{P}_{\textup{MoM}}\vb*{e}=\vb*{e}\iff\hat{\Sigma}\vb*{e}=0$.}
+        \medskip
+        
+        \onslide<4->{Il caso $\hat{\vb*{m}}<0$ potrebbe restituire $\hat{P}_{\textup{MoM}}$ con elementi negativi (è stato anche osservato sperimentalmente), ma non è chiaro se è possibile avere $\hat{P}_{\textup{MoM}}$ con elementi negativi anche quando $\hat{\vb*{m}}<0$.}
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:P_mom_stochastic}{\faHandPointLeft}}
+    \end{frame}
+
+    \begin{frame}
+        {Dettagli sulla stocasticità di \texorpdfstring{$\hat{P}_{\textup{MoM}}$}{P_mom} 2/2}
+        {\hypertarget{frame:P_mom_stochastic_noise:appendice}{Considerazioni sui termini di rumore \texorpdfstring{$\langle\epsilon_t,\vb*{e}\rangle$}{e^t*eps_t}, \texorpdfstring{$\langle\vb*{m}_{\epsilon},\vb*{e}\rangle$}{e^t*m_{eps}^t}}}
+
+        Per il caso $K=1$, rumore gaussiano, $\hat{\vb*{m}}\ge 0$, abbiamo ottenuto
+        $\hat{\Sigma}=0\iff\langle\vb*{m}_{\epsilon},\vb*{e}\rangle\cdot\big((T+1)\hat{\vb*{m}}-\vb*{y}_T\big)+\langle\epsilon_1,\vb*{e}\rangle\cdot\hat{\vb*{m}}+\sum_{t=1}^{T-1}\langle\epsilon_{t+1},\vb*{e}\rangle\cdot\vb*{y}_t=0$
+        \smallskip 
+        
+        Per ipotesi
+        \begin{itemize}
+            \item $\epsilon_t\independent\epsilon_s\quad\forall\,t\ne s\in[T]$, e $\epsilon_t(i)\sim\mathcal{N}(0,\sigma^2)\quad\forall\,t\in[T],\forall\,i\in[S]$
+            \item $\epsilon_t=(\epsilon_t(i))_{i\in[S]}\in\R{S}$, con $\epsilon_t(i)\independent\epsilon_t(j)\quad\forall\,i\ne j$
+        \end{itemize}
+        Dunque $\langle\epsilon_t,\vb*{e}\rangle\sim\mathcal{N}(0,S\sigma^2)$ e di conseguenza 
+        \[
+            \P{\langle\epsilon_t,\vb*{e}\rangle\in[-\delta,\delta]}=\P{\frac{-\delta}{\sigma\sqrt{S}}\le Z\le\frac{\delta}{\sigma\sqrt{S}}}=2\Phi\qty(\frac{\delta}{\sigma\sqrt{s}})-1
+        \]
+        Similmente $\langle\vb*{m}_{\epsilon},\vb*{e}\rangle=\frac{1}{T}\sum_{t=1}^T\langle\epsilon_t,\vb*{e}\rangle\sim\mathcal{N}(0,\delta\frac{\sigma^2}{T^2})$ e 
+        \[
+            \P{\langle\vb*{m}_{\epsilon},\vb*{e}\rangle\in[-\delta,\delta]}=2\Phi\qty(\frac{\delta T}{\sigma\sqrt{S}})-1\xrightarrow{T\to\infty}1
+        \]
+        Il che dimostra che per $T\to\infty$ $\langle\vb*{m}_{\epsilon},\vb*{e}\rangle$ converge in probabilità a $\mathbb{E}\qty[\epsilon_t(i)]=0$.
+
+        \blankfootnote{\textbf{Indietro:}~\hyperlink{frame:P_mom_stochastic}{\faHandPointLeft}}
+    \end{frame}
 
     \begin{frame}
         {Consistenza di \texorpdfstring{$\hat{P}_{T,K}$}{P_T,K} per \texorpdfstring{$K\to\infty$}{K tendente a infinito}$\qquad 1/2$}
-        {\hypertarget{frame:teorema1_lim_mhat:appencide}{Dettagli sul calcolo di \texorpdfstring{$\lim_K\hat{\vb*{m}}$}{un limite}}}
+        {\hypertarget{frame:teorema1_lim_mhat:appendice}{Dettagli sul calcolo di \texorpdfstring{$\lim_K\hat{\vb*{m}}$}{un limite}}}
 
         %\begin{block}{}
         Nel calcolo di $\lim_K\hat{\vb*{m}}$ si fa uso dell'ipotesi di stazionarietà:
